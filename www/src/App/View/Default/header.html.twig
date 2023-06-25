@@ -1,0 +1,737 @@
+<link rel="stylesheet" href="/thirdparty/jquery-ui-1.12.1.min.css">
+
+<style>
+    .badge {
+        position: fixed;
+        z-index: 1;
+    }
+
+    .mobBadge {
+        cursor: pointer;
+    }
+
+    .nameBadge {
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .stateBadge {
+        top: -7px;
+        right: -4px;
+    }
+
+    #cursorView {
+        display: none;
+        position: absolute;
+        height: 25px;
+        width: 25px;
+        margin: auto;
+        background-color: #062c33;
+    }
+
+    #diceView {
+        display: none;
+        position: absolute;
+        left: 5px;
+        bottom: 5px;
+    }
+
+
+    #sharedItemsView {
+        position: absolute;
+        right: 50px;
+        bottom: 50px;
+    }
+
+    #characterHoverView {
+        display: none;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        margin: auto;
+        background-color: #062c33;
+        z-index: 101;
+    }
+
+    #enemyContextMenu, #contextMenu {
+        display: none;
+        position: absolute;
+        margin: auto;
+        z-index: 102;
+    }
+
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+        /* add padding to account for vertical scrollbar */
+        padding-right: 20px;
+    }
+
+    .focusRow {
+        z-index: 5;
+        position: relative;
+    }
+
+    .boss {
+        width: 110px !important;
+        height: 110px !important;;
+        transform: translate(-22px, -22px) !important;;
+    }
+
+
+    #diceRoller {
+        position: absolute;
+        left: 53px;
+        bottom: 11px;
+    }
+
+    .playerImage {
+        width: 50px;
+    }
+
+    @font-face {
+        font-family: magicMedieval;
+        src: url("/images/Magicmedieval-pRV1.ttf");
+        font-style: normal;
+        font-weight: 600;
+    }
+
+    .thumbCard {
+        width: 30px;
+        height: 42px;
+    }
+
+    .thumbCardOnField {
+        width: 120px;
+        height: 168px;
+    }
+
+    #leaderBoard {
+        z-index: 100;
+        left: 0;
+        top: 60px;
+        height: 40px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        display: inline-flex;
+        flex-wrap: wrap;
+        position: absolute;
+    }
+
+    .red .top {
+        border-bottom-color: red !important;
+    }
+
+    .red .middle {
+        background: red !important;
+    }
+
+    .red .bottom {
+        border-top-color: red !important;
+    }
+
+    .blue .top {
+        border-bottom-color: blue !important;
+    }
+
+    .blue .middle {
+        background: blue !important;
+    }
+
+    .blue .bottom {
+        border-top-color: blue !important;
+    }
+
+    .green .top {
+        border-bottom-color: #6C6 !important;
+    }
+
+    .green .middle {
+        background: #6C6 !important;
+    }
+
+    .green .bottom {
+        border-top-color: #6C6 !important;
+    }
+
+    .lastRow.even {
+        background: transparent !important;
+    }
+
+    #icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    #upperBoard.play {
+        width: 100%;
+    }
+
+    #upperBoard.boards {
+        width: 99%;
+    }
+
+    #board {
+        top: 25px;
+        left: 35px;
+    }
+
+    #board .field, #colorPicker.field, #colorPickerSelect .field {
+        background-color: transparent;
+        float: left;
+        background-image: url("/images/kde/fields/Empty.png");
+        border-radius: 99%;
+    }
+
+    #board .hiddenField {
+        background-color: clear;
+        border-radius: 99%;
+    }
+
+    #board.small .hiddenField {
+        width: 44px;
+        height: 44px;
+        transform: translate(0px, 2px);
+    }
+
+    #board.middle .hiddenField {
+        width: 66px;
+        height: 66px;
+        transform: translate(4px, 5px);
+    }
+
+    #board.default .hiddenField {
+        width: 88px;
+        height: 88px;
+        transform: translate(6px, 6px);
+    }
+
+    #board.screen .hiddenField {
+        width: 88px;
+        height: 88px;
+        transform: translate(6px, 6px);
+    }
+
+    #board.small .fieldRow {
+        margin-top: -42px;
+        display: inline-flex;
+    }
+
+    #board.middle .fieldRow {
+        margin-top: -42px;
+        display: inline-flex;
+    }
+
+    #board.default .fieldRow {
+        height: 88px;
+        margin-top: -28px;
+        display: inline-flex;
+    }
+
+    #board.screen .fieldRow {
+        height: 176px;
+        margin-top: -36px;
+        display: inline-flex;
+    }
+
+    #board.small .field.even {
+        transform: translate(0, 21px);
+    }
+
+    #board.middle .field.even {
+        transform: translate(0, 32px);
+    }
+
+    #board.default .field.even {
+        transform: translate(0, 44px);
+    }
+
+    #board.screen .field.even {
+        transform: translate(0, 88px);
+    }
+
+    #board.small .field {
+        width: 50px;
+        height: 50px;
+        margin-left: -12px;
+        margin-top: 28px;
+        background-size: 50px;
+    }
+
+    #board.middle .field {
+        width: 75px;
+        height: 75px;
+        margin-left: -18px;
+        margin-top: 23px;
+        background-size: 75px;
+    }
+
+    #board.default .field, #colorPicker.field, #colorPickerSelect .field {
+        width: 100px;
+        height: 100px;
+        margin-left: -25px;
+        margin-bottom: 0;
+        margin-top: 6px;
+        background-size: 100px;
+    }
+
+    #board.screen .field, #colorPicker.field, #colorPickerSelect .field {
+        width: 200px;
+        height: 200px;
+        margin-left: -48px;
+        margin-bottom: 0;
+        margin-top: 6px;
+        background-size: 200px;
+    }
+
+    #board.small .hiddenField .animal, #board.small .hiddenField .fieldIcon {
+        z-index: 1;
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        transform: translate(0, -2px);
+    }
+
+    #board.middle .hiddenField .animal, #board.middle .hiddenField .fieldIcon {
+        z-index: 1;
+        position: absolute;
+        width: 75px;
+        height: 75px;
+        transform: translate(-4px, -6px);
+    }
+
+    #board.default .hiddenField .animal, #board.default .hiddenField .fieldIcon {
+        z-index: 1;
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        transform: translate(-7px, -6px);
+    }
+
+    #board.screen .hiddenField .animal, #board.default .hiddenField .fieldIcon {
+        z-index: 1;
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        transform: translate(-7px, -6px);
+    }
+
+    .field.empty {
+        background-image: url("/images/kde/fields/Empty.png") !important;
+    }
+
+    .field.energy {
+        background-image: url("/images/kde/fields/Energie.png") !important;
+    }
+
+    .field.fire {
+        background-image: url("/images/kde/fields/Feuer.png") !important;
+    }
+
+    .field.forest {
+        background-image: url("/images/kde/fields/Wald.png") !important;
+    }
+
+    .field.ice {
+        background-image: url("/images/kde/fields/Eis.png") !important;
+    }
+
+    .field.rock {
+        background-image: url("/images/kde/fields/Fels.png") !important;
+    }
+
+    .field.sand {
+        background-image: url("/images/kde/fields/Sand.png") !important;
+    }
+
+    .field.swamp {
+        background-image: url("/images/kde/fields/Sumpf.png") !important;
+    }
+
+    .field.water {
+        background-image: url("/images/kde/fields/Wasser.png") !important;
+    }
+
+    .field.building {
+        background-image: url("/images/kde/fields/Gebaeude.png") !important;
+    }
+
+    .field.market {
+        background-image: url("/images/kde/fields/Marktplatz.png") !important;
+    }
+
+    .field.grass {
+        background-image: url("/images/kde/fields/Gras.png") !important;
+    }
+
+    .field.door {
+        background-image: url("/images/kde/fields/Tuer.png") !important;
+    }
+
+    .perspective {
+        -webkit-transform: perspective(600px) rotateX(60deg);
+        -moz-transform: perspective(600px) rotateX(60deg);
+        -ms-transform: perspective(600px) rotateX(60deg);
+        -o-transform: perspective(600px) rotateX(60deg);
+        transform: perspective(600px) rotateX(60deg);
+    }
+</style>
+{% if isLeader %}
+    <div id="leaderBoard">
+        <div class="area">
+            <button id="libraryButton" title="Bibliothek" class="syncButton btn btn-primary">
+                Deck:&nbsp;<span id="numberOfLibraryCards">-</span>
+            </button>
+            <button id="graveyardButton" title="Friedhof" class="btn btn-light">
+                <span class="fas fa-skull" id="numberOfTrashCards">-</span>
+            </button>
+            <button id="mapButton" title="Map wechseln" class="syncButton btn btn-light">
+                <span class="fas fa-map"></span>
+            </button>
+        </div>
+        <div class="area">
+            <select id="inputEnemyLife" class="form-control">
+                {% for i in 1..10 %}
+                    <option>{{ i }}</option>
+                {% endfor %}
+            </select>
+            <button class="syncButton btn btn-primary" id="lootCardButton">Loot</button>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+    .area {
+        padding: 2px;
+        margin-bottom: 2px;
+        height: 44px;
+        border: 2px solid darkslategrey;
+        display: inline-flex;
+    }
+
+    .area button {
+        margin-left: 5px;
+    }
+
+    #leaderBoard .btn {
+        margin-top: 0px;
+        height: 36px;
+    }
+
+    #leaderBoard input {
+        width: 50px;
+    }
+
+    #leaderBoard select {
+        width: 75px;
+    }
+
+    .kdeCard > img {
+        width: 300px;
+        height: 412px;
+    }
+
+
+    .kdeCard.horizontal > img {
+        width: 550px;
+        height: 401px;
+    }
+
+    .kdeCardNew:not(.horizontal) {
+        width: 100px;
+        height: 136px;
+        cursor: pointer;
+    }
+
+    .kdeCardNew.horizontal {
+        width: 136px;
+        height: 100px;
+        cursor: pointer;
+    }
+
+    .playerName, .doButton, .dropdown-submenu {
+        cursor: pointer;
+    }
+</style>
+
+
+<script>
+    let colors = ["empty", "energy", "fire", "forest", "ice", "rock", "sand", "swamp", "water", "building", "grass", "door"];
+
+    let values = {};
+    let userId = "{{ kdeUserId }}";
+
+    let animal = undefined;
+    let playerAnimal = undefined;
+    let cursorView = $('#cursorView');
+    let gameId = "{{ gameId }}";
+    let boardId = "{{ boardId }}";
+    let mergePlayer = undefined;
+    let activeContextMenuAnimal = undefined;
+    let activeContextMenuField = undefined;
+    let lootCardButton = $('#lootCardButton');
+    let libraryButton = $('#libraryButton');
+    let mapButton = $('#mapButton');
+    let lootCardSelect = $('#lootCardSelect');
+    let modalCharacterEntry = $('#modalCharacterEntry');
+    let isLeader = {% if isLeader %}true{% else %}false{% endif %};
+    let takesPart = {% if takesPart %}true{% else %}false{% endif %};
+
+    let nav = $('.blog-header');
+    let mainView = $('#mainView');
+    let customPlayers = {{ customPlayers|json_encode|raw }};
+    let enemies = {{ enemies|json_encode|raw }};
+
+    let syncCallPending = false;
+    let syncCallDone = 0;
+    let allowEnableOfSyncButton = false;
+    let currentRequestId = 0;
+    let syncInterval = 100;
+    let timeOutTime = 0;
+
+    let hoveredMobBadgeForLeader = undefined;
+
+    // calculate maxRequests
+    // max request time: 10 minutes
+    let maxRequests = 1000 / syncInterval * 60 * 10 * 10;
+
+
+    function loadBoard(boardId) {
+        get("&board&load&boardId=" + boardId, function (success, data) {
+            values = data.board;
+            if (values === "") {
+                values = {};
+            }
+            for (let key in values) {
+                let color = values[key];
+                let object = $('#' + key);
+                setColor(object, color);
+            }
+
+            $('.hiddenField').on('click', function () {
+                let fieldId = $(this).attr("id");
+
+                if (animal !== undefined && fieldId !== animal.parent().attr("id")) {
+                    let animalId = animal.parent().attr("id");
+                    let that = $(this);
+                    // do not overwrite other figures
+                    if (that.children().length > 0) {
+                        return;
+                    }
+                    get("&moveFigure&from=" + animalId + "&to=" + fieldId, function (success, data) {
+                        doAction(function () {
+                            that.append(animal);
+                            animal.removeClass("marked");
+                            animal = undefined;
+                            $('#enemyContextMenu').hide();
+                            $('#characterHoverView').hide();
+                        });
+                    });
+                } else if (playerAnimal !== undefined && fieldId !== playerAnimal.parent().attr("id")) {
+                    let that = $(this);
+                    // do not overwrite other figures
+                    if (that.children().length > 0) {
+                        return;
+                    }
+                    let selectedUserId = playerAnimal.attr("id").split("_")[1];
+                    get("&movePlayer&selectedUserId=" + selectedUserId + "&to=" + fieldId, function (success, data) {
+                        doAction(function () {
+                            that.append(playerAnimal);
+                            playerAnimal.removeClass("marked");
+                            playerAnimal = undefined;
+                        });
+                    });
+                } else if (mergePlayer !== undefined) {
+                    let that = $(this);
+                    // do not overwrite other figures
+                    if (that.children().length > 0) {
+                        return;
+                    }
+                    get("&setMergePlayer&to=" + fieldId, function (success, data) {
+                        doAction(function () {
+                            $('#mergePlayer').remove();
+                            that.append(getHTMLMergePlayer());
+                            $('.playerIcon').remove();
+                            mergePlayer = undefined;
+                        });
+
+                    });
+                }
+            });
+
+
+            $('.hiddenField').on('contextmenu', function (e) {
+                hideOverlays();
+                if ($(this).hasClass("noContextMenu")) {//} || $(this).children().length > 0) {
+                    return;
+                }
+                activeContextMenuField = $(this);
+
+                let contextMenu = $('#fieldContextMenu');
+
+                let editEnemyArea = $('#editEnemySubmenu');
+                let spawnEnemyArea = $('#spawnEnemySubmenu');
+                let spawnPetArea = $('#spawnPetSubmenu');
+                let spawnEventArea = $('#spawnEventSubmenu');
+                let splitPlayersButton = $('#splitPlayersButton');
+                let filterContextMenu = $('#filterContextMenu');
+                let mergePlayersButton = $('#mergePlayersButton');
+
+                editEnemyArea.hide()
+                spawnEnemyArea.hide();
+                spawnPetArea.hide();
+                spawnEventArea.hide();
+                splitPlayersButton.hide();
+                filterContextMenu.hide();
+                mergePlayersButton.hide();
+
+                if (isLeader) {
+                    if ($(this).children().length > 0) {
+                        activeContextMenuAnimal = $($(this).children()[0]);
+                        if (activeContextMenuAnimal.hasClass("animal")) {
+                            editEnemyArea.show();
+                        } else {
+                            splitPlayersButton.show();
+                            mergePlayersButton.show();
+                        }
+                    } else {
+                        spawnEnemyArea.show();
+                        spawnPetArea.show();
+                        spawnEventArea.show();
+                        filterContextMenu.show();
+                    }
+                } else {
+                    contextMenu.find('.leaderContextMenu').remove();
+                }
+                contextMenu.show();
+
+                let x = event.pageX;
+                if (x > $(window).width() - 250) {
+                    x = $(window).width() - 250;
+                }
+                let y = event.pageY;
+                if (y > $(window).height() - 200) {
+                    y = $(window).height() - 200;
+                }
+                contextMenu.css("top", y);
+                contextMenu.css("left", x);
+
+                e.preventDefault();
+            });
+
+        })
+    }
+
+    function getHTMLMergePlayer() {
+        return '<img id="mergePlayer" class="fieldIcon" src="/images/kde/fields/group.png">';
+    }
+
+    // setColor($("#0_0"), "red")
+    function setColor(object, newColor) {
+        for (let i = 0; i < colors.length; i++) {
+            let color = colors[i];
+            object.parent().removeClass(color)
+        }
+        object.parent().addClass(newColor);
+        let id = object.attr("id");
+        if (id !== "colorPicker") {
+            values[id] = newColor;
+        }
+    }
+
+    function setAnimalEventHandler() {
+        $('.animal').unbind('click');
+
+        $('.animal').on('click', function () {
+            if (isLeader || $(this).hasClass("pets")) {
+
+            } else {
+                return;
+            }
+            if (animal !== undefined && animal.hasClass("marked")) {
+                doAction(function () {
+                    animal.removeClass("marked");
+                    animal = undefined;
+                    $('#enemyContextMenu').hide();
+                });
+                return;
+            }
+            animal = $(this);
+            animal.addClass("marked");
+        });
+        $('.playerIcon').unbind('click');
+        $('.playerIcon').on('click', function () {
+            if (!$(this).attr("id").split("_")[1]) {
+                return;
+            }
+            if (playerAnimal !== undefined && playerAnimal.hasClass("marked")) {
+                doAction(function () {
+                    playerAnimal.removeClass("marked");
+                    playerAnimal = undefined;
+                });
+                return;
+            }
+            playerAnimal = $(this);
+            playerAnimal.addClass("marked");
+        });
+        if (isLeader) {
+            $('.mobBadge').on('mouseover', function () {
+                let badge = $(this);
+                hoveredMobBadgeForLeader = badge;
+                badge.css("font-size", "20px");
+            });
+            $('.mobBadge').on('mouseout', function () {
+                let badge = $(this);
+                hoveredMobBadgeForLeader = undefined;
+                badge.css("font-size", "12px");
+            });
+        }
+    }
+
+
+    function hideOverlays() {
+        $('.contextMenu').hide();
+    }
+
+    function doAction(doFunction) {
+        doFunction();
+    }
+
+    function sessionExpired() {
+        return currentRequestId >= maxRequests
+    }
+
+
+    function get(path, done) {
+        let api = "/api/general?kde";
+        let url = api + path + "&version={{ version }}&gameId=" + gameId + "&userId=" + userId;
+        $.getJSON(url, function (data) {
+            setTimeout(function () {
+                done(true, data);
+            }, timeOutTime);
+
+        }).fail(function (data) {
+            setTimeout(function () {
+                done(false, data);
+            }, timeOutTime);
+        });
+    }
+
+    function post(path, data, done) {
+        let api = "/api/general?kde";
+        let url = api + path + "&version={{ version }}&gameId=" + gameId + "&userId=" + userId;
+
+        $.post(url, data, function (response) {
+            setTimeout(function () {
+                done(true, response);
+            }, timeOutTime);
+        }).fail(function (response) {
+            setTimeout(function () {
+                done(false, response);
+            }, timeOutTime);
+        });
+    }
+</script>

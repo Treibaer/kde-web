@@ -1,0 +1,381 @@
+{% include '/Default/header.html.twig' %}
+<div class="container p-4 " id="mainView">
+    <div class="border rounded p-1">
+        <table class="table table-sm table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Leiter</th>
+                <th>Brett</th>
+                <th>Spieler</th>
+                <th>Aktionen</th>
+            </tr>
+            {% for game in games %}
+                <tr class="">
+                    <td>{{ game.gameId }}</td>
+                    <!--<td id="leader_{{ game.gameId }}">{{ game.leader }}</td>-->
+                    <td>
+                        <select id="selectLeader_{{ game.gameId }}" class="form-control">
+                            {% for user in users %}
+                                <option value="{{ user.id }}"
+                                        {% if user.user == game.leader %}selected{% endif %}>{{ user.user }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <!--<td>{{ boards[game.boardId].title }} [{{ boards[game.boardId].boardId }}]</td>-->
+                    <td>
+                        <select id="selectBoardId_{{ game.gameId }}" class="form-control">
+                            {% for board in boards %}
+                                <option value="{{ board.boardId }}"
+                                        {% if board.boardId == game.boardId %}selected{% endif %}>{{ board.title }}
+                                    [{{ board.boardId }}]
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% for player in game.players %}
+                            {% if player.url is defined %}
+                                <a class="link-success" href="{{ player.url }}" target="_blank">
+                                    {{ player.name }}
+                                </a>
+                            {% else %}
+                                {{ player.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <button id="_{{ game.gameId }}" class="editButton btn btn-success">
+                            <span class="fas fa-save" aria-hidden="true"></span>
+                        </button>
+                        <a href="{{ gameUrl }}{{ game.gameId }}" target="_blank">
+                            <button class="btn btn-success">
+                                <span class="fas fa-gamepad" aria-hidden="true"></span>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <br><br>
+
+    <div class="border rounded p-1">
+        <table class="table table-sm table-dark">
+            <tr>
+                <td colspan="2">Spiel erstellen:</td>
+            </tr>
+            <tr>
+                <td>Leiter</td>
+                <td>
+                    <select id="selectLeader" class="form-control">
+                        {% for user in users %}
+                            <option value="{{ user.id }}"
+                                    {% if user.user == myUserName %}selected{% endif %}>{{ user.user }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Brett</td>
+                <td>
+                    <select id="selectBoardId" class="form-control">
+                        {% for board in boards %}
+                            <option value="{{ board.boardId }}">{{ board.title }} [{{ board.boardId }}]</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>Charakter</td>
+                <td><span class="fas fa-trash" aria-hidden="true"></span></td>
+            </tr>
+            {% for i in 0..4 %}
+                <tr class="playerRow" style="{% if i > 1 %}display:none{% endif %}">
+                    <td>Spieler</td>
+                    <td>
+                        <select class="selectPlayer form-control">
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.user }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="selectCharacter form-control">
+                            {% for character in characters %}
+                                <option value="{{ character.characterId }}">{{ character.type }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger hideButton"><span class="fas fa-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2">
+                    <button class="btn btn-success" id="addPlayer">Spieler hinzufügen</button>
+                </td>
+
+                <td colspan="2">
+                    <button class="btn btn-success" id="startGame">Spiel starten</button>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<style>
+    #playArea {
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid black;
+    }
+</style>
+
+<div id="modalCharacterEntry" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="headline">Spiel erstellen</h5>
+                <button type="button" id="dialogCloseButton" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-danger" style="display: none;" id='errorAlert' role="alert">
+                    <div id='errorAlertValue' class="alert-link">unknown</div>
+                </div>
+
+                <div class="alert alert-warning" style="display: none;" id='warningAlert' role="alert">
+                    <div id='warningAlertValue' class="alert-link">Leiter ist kein Spieler</div>
+                </div>
+
+                <div class="alert alert-success" style="display: none;" id='successAlert' role="alert">
+                    <div id='' class="alert-link">Leiter nimmt am Spiel teil</div>
+                </div>
+
+                <table class="table table-sm modalCharacterEntryTable {% if darkMode %}table-dark{% endif %}"
+                       style="width: 100%">
+                    <tr>
+                        <td>Leiter</td>
+                        <td>unknown</td>
+                    </tr>
+                    <tr>
+                        <td>Spieler</td>
+                        <td>unknown</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="dialogCancelButton" class="btn btn-secondary" data-dismiss="modal">Abbrechen
+                </button>
+                <button type="button" id="buttonSaveCharacter" class="btn btn-primary">Erstellen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var guestNames = {{ guestNames|json_encode|raw }};
+    var userNames = {{ users|json_encode|raw }};
+    var characters = {{ characters|json_encode|raw }};
+
+
+    var closeButton = $('#dialogCloseButton'),
+        cancelButton = $('#dialogCancelButton'),
+        saveButton = $('#buttonSaveCharacter');
+    var dialog = $('#modalCharacterEntry');
+
+    let buttonAddPlayer = $('#addPlayer');
+    let buttonStartGame = $('#startGame');
+    let inputLeader = $('#selectLeader');
+    let selectBoardId = $('#selectBoardId');
+    var tabBar = $('#tabBar');
+
+    let players = {};
+    let leader = 0;
+    let selectedBoardId = 1;
+    let editButtons = $('.editButton');
+
+
+    $(document).ready(function () {
+        $('body').unbind("keyup");
+        $('body').on("keyup", function (e) {
+            let modalOpen = dialog;
+            if (e.which === 27 && modalOpen.is(":visible")) {
+                showDialog(false);
+            }
+        });
+
+        closeButton.click(function () {
+            showDialog(false);
+        });
+        cancelButton.click(function () {
+            showDialog(false);
+        });
+        saveButton.click(function () {
+            closeButton.attr("disabled", true);
+            cancelButton.attr("disabled", true);
+            saveButton.attr("disabled", true);
+            createGame();
+        });
+
+
+        $('.hideButton').on('click', function () {
+            $(this).parent().parent().hide();
+            buttonAddPlayer.attr("disabled", false);
+        });
+
+        editButtons.on('click', function () {
+            $(this).attr("disabled", true);
+            let that = $(this);
+            let gameId = $(this).attr("id").split('_')[1];
+            let boardId = $('#selectBoardId_' + gameId).val();
+            let leader = $('#selectLeader_' + gameId).val();
+            let data = {
+                "gameId": gameId,
+                "boardId": boardId,
+                "leader": leader,
+            };
+            $.post("/api/general?kde&game&save&version={{ version }}", data, function (data) {
+                that.attr("disabled", false);
+                location.reload();
+            });
+        });
+
+        buttonAddPlayer.on('click', function () {
+            let allHiddenRows = $('.playerRow:hidden');
+            if (allHiddenRows.length === 1) {
+                buttonAddPlayer.attr("disabled", true);
+            }
+            allHiddenRows.first().show();
+        });
+
+        // goal: {"0":{"id":1, "name": ""}, "1":{"id":3, "name": ""}, "2": {"id":"GUEST", "name": "Markus"}}
+        buttonStartGame.on('click', function () {
+            let selectedPlayers = $('.playerRow:visible');
+            players = {};
+            leader = inputLeader.val();
+            selectedBoardId = selectBoardId.val();
+
+            selectedPlayers.each(function () {
+                let row = $(this);
+                let player = row.find(".selectPlayer");
+                let characterId = row.find(".selectCharacter").val();
+                players[Object.keys(players).length] = {
+                    "id": player.val(),
+                    "name": "",
+                    "characterId": characterId,
+                };
+            });
+
+            prepareDialog(leader, players);
+
+            showDialog(true);
+        });
+
+
+        function showDialog(show) {
+            if (show) {
+                blurBackground();
+                dialog.show();
+            } else {
+                blurBackground(false);
+                dialog.hide();
+            }
+        }
+
+        function blurBackground(blur = true) {
+            var filter = blur ? 'blur(5px)' : '';
+            nav.css('filter', filter);
+            mainView.css('filter', filter);
+            tabBar.css('filter', filter);
+        }
+
+        function prepareDialog(leader, players) {
+            let error = false;
+            let errorMessage = "";
+            let table = $('.modalCharacterEntryTable');
+            table.empty();
+            table.append("<tr><td>Leiter</td><td>" + userNames[leader].user + "</td></tr>");
+            let keys = Object.keys(players);
+
+            let isLeaderAlsoAPlayer = false;
+            let allNames = [];
+
+            for (let i = 0; i < keys.length; i++) {
+                let player = players[i];
+                let id = player.id;
+                if (leader === id) {
+                    isLeaderAlsoAPlayer = true;
+                }
+                let name =  userNames[id].user;
+                if (allNames.includes(name)) {
+                    error = true;
+                    errorMessage = errorMessage + "Spieler " + name + " mehrfach<br>";
+                }
+                allNames.push(name);
+                table.append("<tr><td>Spieler</td><td>" + name + "</td></tr>");
+            }
+
+            if (keys.length < 2) {
+                error = true;
+                errorMessage = errorMessage + "Nicht genug Spieler<br>";
+            }
+
+            saveButton.attr("disabled", error);
+
+            if (error) {
+                showAlert("error", errorMessage);
+            } else {
+                if (!isLeaderAlsoAPlayer) {
+                    showAlert("warning");
+                } else {
+                    showAlert("success");
+                }
+            }
+        }
+
+        let errorAlert = $('#errorAlert');
+        let errorAlertValue = $('#errorAlertValue');
+        let warningAlert = $('#warningAlert');
+        let successAlert = $('#successAlert');
+
+
+        function createGame() {
+            $.post("/api/general?kde&createGame", {
+                "players": players,
+                "leader": leader,
+                "boardId": selectedBoardId
+            }, function (data) {
+                location.reload();
+            });
+        }
+
+        function showAlert(type, message) {
+            errorAlert.hide();
+            warningAlert.hide();
+            successAlert.hide();
+            switch (type) {
+                case "error":
+                    errorAlert.show();
+                    errorAlertValue.html(message);
+                    break;
+                case "warning":
+                    warningAlert.show();
+                    break;
+                case "success":
+                    successAlert.show();
+                    break;
+            }
+        }
+    });
+
+</script>

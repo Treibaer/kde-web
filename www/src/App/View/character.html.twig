@@ -1,0 +1,207 @@
+<script src="/thirdparty/jquery-ui-1.12.1.min.js"></script>
+<link rel="stylesheet" href="/thirdparty/jquery-ui-1.12.1.min.css">
+<style>
+    #characterTable .characterField {
+        width: 200px;
+        padding: 2px;
+    }
+
+    #characterTable .small {
+        width: 94px;
+    }
+
+    #characterTable .full {
+        width: 95%;
+        padding-bottom: 5px;
+    }
+
+    #characterTable {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    #mainView {
+        padding: 5px;
+    }
+</style>
+<div id="mainView" class="container p-4">
+    <div id="characterTable">
+        {% for character in characters %}
+            <div class="characterField border" style="white-space: nowrap;">
+                <div>
+                    <button type="button" characterId="{{ character.characterId }}"
+                            class="btn btn-sm btn-success buttonEdit">
+                        <span class="fas fa-pencil-alt" aria-hidden="true"></span>
+                    </button> {{ character.name }}</div>
+                <img class="small"  src="{{ character.fieldImageUrl }}">
+                {{ character.type }} <br>
+                <img class="full" src="{{ backgroundCharacterCardUrl }}" data-original="{{ character.fullCardUrl }}">
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <button type="button" characterId="-1" class="btn btn-success buttonEdit">Neuer Charakter</button>
+</div>
+
+
+{% include '/dialog_character.html.twig' %}
+
+<script>
+    $(document).ready(function () {
+        $('.full').lazyload();
+        var allCharacters = JSON.parse('{{ characters | json_encode |raw }}');
+        var dummyCharacter = JSON.parse('{{ dummyCharacter | json_encode |raw }}');
+
+        var selectedCharacterId = -1;
+
+        var dialog = $('#modalCharacterEntry'),
+            characterTable = $('#characterTable'),
+            nav = $('.blog-header'),
+            tabBar = $('#tabBar'),
+            headline = $('#headline'),
+            name = $('#name'),
+            image = $('#fullCardUrl'),
+            fieldImage = $('#fieldImageUrl')
+        ;
+
+        let editButtons = $('.buttonEdit'),
+            closeButton = $('#dialogCloseButton'),
+            cancelButton = $('#dialogCancelButton'),
+            saveButton = $('#buttonSaveCharacter');
+
+        function saveCharacter() {
+            let character = {};
+
+            for (let key in dummyCharacter) {
+                let v = $('#' + key).val();
+                if (v !== undefined) {
+                    v = v.replaceAll("+", "230j2d3p903j");
+                }
+                character[key] = v;
+            }
+
+            character.characterId = selectedCharacterId;
+
+            $.post('/api/kde/character/edit', character, function (data) {
+                showDialog(false);
+                location.reload();
+            });
+        }
+
+        function fillDialog(characterId) {
+            closeButton.attr("disabled", false);
+            cancelButton.attr("disabled", false);
+            saveButton.attr("disabled", false);
+
+            let character = (characterId != -1 && allCharacters[characterId] !== undefined) ? allCharacters[characterId] : dummyCharacter;
+            selectedCharacterId = characterId;
+
+            headline.html(characterId == -1 ? "Neuer Charakter" : character.name);
+
+            for (let key in character) {
+                $('#' + key).val(character[key]);
+            }
+
+            let imageUrl = character.fullCardUrl != "" ? character.fullCardUrl : "/images/kde-icon.png";
+            image.attr("src", imageUrl);
+            let fieldImageUrl = character.fieldImageUrl != "" ? character.fieldImageUrl : "/images/kde-icon.png";
+            fieldImage.attr("src", fieldImageUrl);
+
+        }
+
+        function showDialog(show, characterId = -1) {
+            fillDialog(characterId);
+            if (show) {
+                blurBackground();
+                dialog.show();
+            } else {
+                blurBackground(false);
+                dialog.hide();
+            }
+        }
+
+        function blurBackground(blur = true) {
+            var filter = blur ? 'blur(5px)' : '';
+            nav.css('filter', filter);
+            characterTable.css('filter', filter);
+            tabBar.css('filter', filter);
+        }
+
+        let body = $('body');
+        body.unbind("keyup");
+        body.on("keyup", function (e) {
+            if (e.which === 27) {
+                showDialog(false);
+            }
+        });
+
+
+        editButtons.click(function () {
+            showDialog(true, $(this).attr("characterId"));
+
+        });
+        closeButton.click(function () {
+            showDialog(false)
+        });
+        cancelButton.click(function () {
+            showDialog(false)
+        });
+        saveButton.click(function () {
+            closeButton.attr("disabled", true);
+            cancelButton.attr("disabled", true);
+            saveButton.attr("disabled", true);
+            saveCharacter();
+        });
+
+        name.on('keyup', function () {
+            headline.html(name.val());
+        });
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+        document.getElementById('files2').addEventListener('change', handleFileSelect2, false);
+
+        function handleFileSelect(evt) {
+            upload(evt.target.files[0], "fullCardUrl")
+        }
+        function handleFileSelect2(evt) {
+            upload(evt.target.files[0], "fieldImageUrl")
+        }
+
+        function upload(file, type) {
+            if (file !== null) {
+                let data = new FormData();
+                data.append('file', file);
+                data.append('name', file.name);
+                data.append('type', type);
+                $.ajax({
+                    url: '/api/kde/character/upload',
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false
+                })
+                    .done(function (response) {
+                        if (0 === response.length) {
+                            console.log("fail");
+                        } else {
+                            console.log("success");
+                            let relativeImageUrl = response.data;
+
+                            if (type === "fieldImageUrl") {
+                                fieldImage.attr('src', relativeImageUrl);
+                                fieldImage.val(relativeImageUrl);
+                            } else {
+                                image.attr('src', relativeImageUrl);
+                                image.val(relativeImageUrl);
+                            }
+                        }
+                    })
+                    .fail(function (response) {
+                        console.log("fail");
+                    })
+                    .always(function () {
+                    });
+            }
+        }
+    });
+</script>

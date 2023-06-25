@@ -1,0 +1,1738 @@
+<!--<script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>-->
+{% include '/Default/header.html.twig' %}
+<style>
+
+    #filterFieldContextMenu {
+        color: red;
+    }
+
+    nav {
+        display: none !important;
+    }
+
+    .animal.pets {
+        cursor: pointer;
+    }
+
+    .lifeBadge {
+        background-color: darkred;
+    }
+
+    .staminaBadge {
+        background-color: darkgreen;
+        top: 23px;
+        left: -8px;
+    }
+
+    .manaBadge {
+        background-color: rebeccapurple;
+        top: 45px;
+    }
+
+    #modalCharacterEntry .modal-dialog {
+        max-width: 80% !important;
+        top: 100px !important;
+    }
+
+    .playerStats {
+        border-radius: 5px;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .smallIcon {
+        width: 20px;
+        height: 20px;
+        margin: 5px;
+    }
+
+    #imagePreview .modal-dialog {
+        max-width: 100vh !important;
+        top: 10px !important;
+        margin-top: 0;
+    }
+
+    #imagePreviewBody {
+        height: calc(100vh - 20px);
+        margin: auto;
+    }
+
+    #imagePreviewBody img {
+        height: 100%;
+        max-width: 100%;
+    }
+
+    #imagePreviewCloseButton {
+        position: absolute;
+    }
+
+    #upperBoard {
+        margin: 170px 165px 170px 165px;
+        height: calc(100vh - 170px - 170px);
+        overflow: hidden;
+        white-space: nowrap;
+        border: 2px solid #1b6d85;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    #lowerField {
+        position: absolute;
+        bottom: 150px;
+        height: 136px;
+        max-width: calc(100% - 602px);
+        min-width: 1vw;
+        left: 50%;
+        transform: translateX(-50%);
+        overflow-x: hidden;
+    }
+
+    #lowerHand {
+        position: absolute;
+        bottom: 5px;
+        height: 148px;
+        max-width: calc(100% - 602px);
+        min-width: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid rgb(33, 37, 41);
+        overflow-x: hidden;
+    }
+
+    #lowerStatus {
+        position: absolute;
+        left: 165px;
+        bottom: 5px;
+    }
+
+    #leftField, #rightField {
+        position: absolute;
+        width: 100px;
+        max-height: calc(100% - 100px);
+        min-height: 1vh;
+        top: 50%;
+        transform: translateY(-50%);
+        overflow-x: hidden;
+    }
+
+    #leftStatus {
+        position: absolute;
+        left: 165px;
+        top: 5px;
+    }
+
+    #leftField {
+        left: 120px;
+    }
+
+    #rightField {
+        right: 120px;
+    }
+
+    body {
+        overflow: hidden;
+    }
+
+    #bagButton {
+        position: absolute;
+        left: 5px;
+        top: 5px;
+    }
+
+    #leftHand, #rightHand {
+        position: absolute;
+        width: 110px;
+        max-height: calc(100% - 100px);
+        min-height: 136px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 6px solid rgb(33, 37, 41);
+        overflow-x: hidden;
+    }
+
+    #leftBackground {
+        background-color: none;
+        position: absolute;
+        left: 5px;
+        top: 20px;
+        width: 20px;
+        height: 20px;
+    }
+
+    #leftHand {
+        left: 5px;
+    }
+
+    #rightHand {
+        right: 5px;
+    }
+
+    #upperField {
+        position: absolute;
+        top: 140px;
+        height: 136px;
+        max-width: calc(100% - 602px);
+        min-width: 1vw;
+        left: 50%;
+        transform: translateX(-50%);
+        overflow-x: hidden;
+    }
+
+    #upperHand {
+        position: absolute;
+        top: 1px;
+        height: 148px;
+        max-width: calc(100% - 602px);
+        min-width: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid rgb(33, 37, 41);
+        overflow-x: hidden;
+    }
+
+    #upperStatus {
+        position: absolute;
+        right: 165px;
+        top: 5px;
+    }
+
+    #rightStatus {
+        position: absolute;
+        right: 165px;
+        bottom: 5px;
+    }
+
+    #rightStatus .horizontal, #upperStatus .horizontal {
+        float: right;
+    }
+
+    .dropdown-submenu > .dropdown-menu {
+        overflow-y: scroll;
+        max-height: 200px;
+    }
+
+    #showCardsOverlay {
+        display: none;
+        background-color: darkgrey;
+        opacity: 1;
+        width: 50%;
+        height: 50%;
+        transform: translate(-50%, -50%);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        padding: 10px;
+        z-index: 3;
+        overflow: scroll;
+    }
+
+    #modalCardHand {
+        display: flex;
+        flex-wrap: wrap;
+        height: {% if isLeader %} calc(50vh - 25px){% else %} 50vh{% endif %};
+        overflow-y: auto;
+        border: 2px solid #1b6d85;
+    }
+
+    .dropdownIcon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .animal.marked, .fieldIcon.marked {
+        opacity: 0.6;
+    }
+
+    #infoView {
+        position: absolute;
+        right: 20px;
+        height: 35px;
+        bottom: 5px;
+        text-align: center;
+        display: inline-flex;
+        margin: 5px;
+        padding: 5px;
+    }
+
+    #infoView div {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+
+    #openCards {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    #mainView, #modalCharacterEntry, #leaderBoard, #imagePreview {
+        display: none;
+    }
+
+    #fightDice {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+    }
+
+    #fightDice img {
+        height: 36px;
+        width: 40px;
+        cursor: pointer;
+    }
+</style>
+
+<div id="modalCharacterEntry" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="headline"><span id="modalCardType"></span> <span
+                            id="modalPlayersName"></span><input type="search" id="overlaySearch" placeholder="Suche...">
+                </h5>
+                <button type="button" id="dialogCancelButton" class="btn btn-secondary" data-dismiss="modal">Schließen
+                </button>
+            </div>
+            <div class="modal-body" id="modalCardHand">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="imagePreview" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" id="imagePreviewBody">
+            </div>
+
+            <button type="button" id="imagePreviewCloseButton" class="btn btn-secondary" data-dismiss="modal">Schließen
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<div id="mainView" style="width: 100%;flex-wrap:wrap">
+    <div id="showCardsOverlay">
+        <div id="openCards" style="">
+        </div>
+    </div>
+    <div style="width:100%;display:flex">
+        <div style="width:100%" id="upperBoard" class="play">
+            <div id="board" class="middle">
+                {% set rows = board.rows %} <!--18-->
+                {% set cols = board.columns %} <!--29-->
+                {% for row in 0..rows - 1 %}
+                    {% set odd = row % 2 == 0 %}
+                    <div class="fieldRow" id="row_{{ row }}" style="">
+                        {% set realColus = odd ? cols : cols - 1 %}
+                        {% for column in 0.. cols - 1 %}
+                            {% set odd = column % 2 == 0 %}
+                            <div class="field {% if not odd %}even{% endif %} {% if row == rows - 1 %}lastRow{% endif %}">
+                                <div id="{{ row }}_{{ column }}" class="hiddenField" style=""></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id="lowerField"></div>
+        <div id="lowerHand"></div>
+        <div id="lowerStatus"></div>
+    </div>
+    <div>
+        <div id="leftBackground"></div>
+        <div id="leftField"></div>
+        <div id="leftHand"></div>
+        <div id="leftStatus"></div>
+    </div>
+    <div>
+        <div id="upperField"></div>
+        <div id="upperHand"></div>
+        <div id="upperStatus"></div>
+    </div>
+    <div>
+        <div id="rightField"></div>
+        <div id="rightHand"></div>
+        <div id="rightStatus"></div>
+    </div>
+    <button id="bagButton" title="Tasche" class="btn btn-light">
+        <span class="fas fa-shopping-bag" id="numberOfBagCards">-</span>
+    </button>
+</div>
+
+<script>
+    let states = {{ states|json_encode|raw }};
+    $(document).ready(function () {
+        $('.dropdown-submenu > a').on("mouseover", function (e) {
+            $('.dropdown-submenu .dropdown-menu').removeClass('show');
+            $(this).next('.dropdown-menu').addClass('show');
+            e.stopPropagation();
+        });
+
+        $('.dropdown').on("hidden.bs.dropdown", function () {
+            // hide any open menus when parent closes
+            $('.dropdown-menu.show').removeClass('show');
+        });
+
+        function lazyLoad(objClass) {
+            $("img" + objClass).lazyload();
+            $("img" + objClass).on('mouseover', function () {
+                let bg = "{{ backgroundSmallCardUrl }}";
+                let bg2 = "{{ backgroundCardUrl }}";
+                if (($(this).attr("src") === bg || $(this).attr("src") === bg2) && $(this).attr("data-original")) {
+                    $(this).lazyload();
+                }
+            });
+        }
+
+        function lazyLoadRaw(objClass) {
+            $(objClass).lazyload();
+            $(objClass).on('mouseover', function () {
+                let bg = "{{ backgroundSmallCardUrl }}";
+                let bg2 = "{{ backgroundCardUrl }}";
+                if (($(this).attr("src") === bg || $(this).attr("src") === bg2) && $(this).attr("data-original")) {
+                    $(this).lazyload();
+                }
+            });
+        }
+
+        function lazyLoadChild(objClass) {
+            $(objClass + ' img').lazyload();
+
+            $(objClass + ' img').on('mouseover', function () {
+                let bg = "{{ backgroundSmallCardUrl }}";
+                let bg2 = "{{ backgroundCardUrl }}";
+                if (($(this).attr("src") === bg || $(this).attr("src") === bg2) && $(this).attr("data-original")) {
+                    $(this).lazyload();
+                }
+            });
+        }
+
+        let characterHoverView = $('#characterHoverView');
+        let characterHoverViewImage = $('#characterHoverViewImage');
+        let state = $('#state');
+        let myPlayerId = "{{ myPlayerId }}";
+        let nav = $('.blog-header');
+        let tabBar = $('#tabBar');
+        let leaderBoard = $('#leaderBoard');
+        let numberOfLibraryCards = $('#numberOfLibraryCards');
+        let numberOfTrashCards = $('#numberOfTrashCards');
+        let numberOfBagCards = $('#numberOfBagCards');
+        let rollDiceButton = $('#fightDice');
+        let openCardsOverlay = $('#showCardsOverlay');
+        let openCardsField = $('#openCards');
+        let fightDice = $('#fightDice');
+        let mainView = $('#mainView');
+        let overlaySearch = $('#overlaySearch');
+
+        let cancelButton = $('#dialogCancelButton');
+        let dialog = $('#modalCharacterEntry');
+        let imagePreviewModal = $('#imagePreview');
+        let modalCardHand = $('#modalCardHand');
+        let body = $('body');
+
+        // complete lifecycle
+        let isAlive = false;
+        let stoppedFromRemote = false;
+        let isInitialized = false;
+        let syncInProgress = false;
+
+        // last positions
+
+        let lastPositions = [];
+        let lastPlayers2 = [];
+        let lastOpenCards = [];
+        let lastPlayers = [];
+        let graveyard = [];
+        let bag = [];
+
+        let openPP = [];
+
+        init();
+
+        function reportWindowSize() {
+            if (myGameUserId === undefined
+                || lastPlayers === undefined
+                || lastPlayers.length === 0) {
+                return;
+            }
+            let positions = ['lower', 'left', 'upper', 'right'];
+            for (let i = myGameUserId; i < myGameUserId + lastPlayers.length; i++) {
+                handleScrollbars(lastPlayers[i % 4], positions[i - myGameUserId]);
+            }
+        }
+
+        function handleScrollbars(player, position) {
+            let h = window.innerHeight;
+            let w = window.innerWidth;
+            let hand = $('#' + position + "Hand");
+            let field = $('#' + position + "Field");
+            if (["left", "right"].includes(position)) {
+                let showScroll = h < 136 * player.hand.length + 100
+                let showScrollField = h < 136 * player.field.length + 100
+                hand.css("overflow-y", showScroll ? "scroll" : "hidden")
+                field.css("overflow-y", showScrollField ? "scroll" : "hidden")
+            } else {
+                let showScroll = w < 100 * player.hand.length + 602
+                let showScrollField = w < 100 * player.field.length + 602
+                hand.css("overflow-y", showScroll ? "scroll" : "hidden")
+                field.css("overflow-y", showScrollField ? "scroll" : "hidden")
+            }
+        }
+
+        function init() {
+            window.addEventListener('resize', reportWindowSize);
+            $('#board').draggable({
+                drag: function () {
+                    if (playerAnimal !== undefined) {
+                        playerAnimal.removeClass("marked");
+                        playerAnimal = undefined;
+                    }
+                },
+            });
+//        $('#upperBoard').addClass("perspective")
+
+            setTimeout(function () {
+                run();
+            }, 10);
+        }
+
+
+        function run() {
+            loadBoard(boardId);
+            loadField(gameId, userId);
+            fade();
+            handleOpenPP();
+        }
+
+        // sync is stopped, when a player or animal is selected, so a sync has to be triggered, when the animal is not selected anymore
+        function handleOpenPP() {
+            if (openPP.length > 0) {
+                loadPlayerPositions(openPP[0], openPP[1]);
+            }
+            setTimeout(function () {
+                handleOpenPP();
+            }, 2000);
+        }
+
+
+        let hash = "";
+
+        function loadField(gameId, userId) {
+            if (stoppedFromRemote) {
+                return;
+            }
+            if (sessionExpired()) {
+                setAlive(false);
+                stoppedFromRemote = true;
+                return;
+            }
+            setTimeout(function () {
+                loadField(gameId, userId)
+            }, syncInterval);
+
+            if (syncInProgress) {
+                return;
+            }
+            syncInProgress = true;
+
+            get("&field&hash=" + hash, function (success, data) {
+                syncInProgress = false;
+                if (success && data.stop) {
+                    setAlive(false);
+                    // stop application from remote
+                    stoppedFromRemote = true;
+                    return;
+                }
+                if (!success) {
+                    setAlive(false);
+                    return
+                }
+                hash = data.hash;
+
+                // board has changed
+                if (boardId !== "" + data.boardId) {
+                    setAlive(false);
+                    stoppedFromRemote = true;
+                    location.reload()
+                    return;
+                }
+
+                setAlive(data.alive);
+
+                if (data.players) {
+                    loadPlayers(data.players);
+                }
+                loadOpenCards(data.openCards);
+                loadFightArea(data.dice, data.diceTime, data.diceRoller);
+                graveyard = data.graveyard;
+                bag = data.bag;
+
+                loadCustomData(data.custom);
+
+                loadPlayerPositions(data.playerPositions, data.players);
+                handleHandCardFunctions();
+
+                numberOfLibraryCards.text(data.numberOfLibraryCards);
+                numberOfTrashCards.text('[' + data.numberOfTrashCards + ']');
+                numberOfBagCards.text('[' + data.numberOfBagCards + ']');
+
+                if (!isInitialized) {
+
+                    $('#modalCharacterEntry').css("display", "block");
+                    $('#modalCharacterEntry').hide();
+                    isInitialized = true;
+                }
+            });
+        }
+
+        function loadPlayerPositions(playerPositions, players) {
+            let playerIcons = $('.playerIcon');
+            if (animal) {
+                openPP = [playerPositions, players];
+                return;
+            }
+            openPP = [];
+
+            if (!equalObjects(lastPlayers2, players)) {
+                if (playerAnimal === undefined) {
+                    lastPlayers2 = players;
+                    playerIcons.remove();
+                    $('.playerBadge').remove();
+                    for (let key in players) {
+                        let player = players[key];
+
+                        let selectedPlayerId = customPlayers[key]["id"];
+                        if (player.position) {
+                            $('#' + player.position).append('' +
+                                '<img nohover="nohover" class="playerIcon fieldIcon hoverCard" hoverImageUrl="' + player.fullCardUrl + '" id="player_' + selectedPlayerId + '" src="' + player.icon + '">' +
+                                '<span style="background-color:' + player.color + '" class="playerBadge badge badge-primary">' + player.life + ' </span>' +
+                                '<span style="background-color:' + player.color + '" class="playerBadge nameBadge badge badge-primary">' + player.name + ' </span>'
+                            );
+                        }
+                        if (selectedPlayerId !== "") {
+                            $('#player_' + selectedPlayerId).css("cursor", "pointer");
+                        }
+                        if (isLeader) {
+                            $('.playerIcon').css("cursor", "pointer");
+                        }
+                    }
+                }
+            }
+
+            if (!equalObjects(lastPositions, playerPositions)) {
+                lastPositions = playerPositions;
+                let animals = $('.animal');
+                animals.remove();
+                animal = undefined;
+                $('.boss').removeClass('boss');
+                $('.mobBadge').remove();
+                for (let key in playerPositions) {
+                    let player = playerPositions[key];
+                    let cardImage = player.enemy.fullCardUrl;
+                    let fieldImage = player.enemy.fieldImageUrl;
+                    let target = $('#' + key);
+                    if (player.state) {
+                        status = '<span class="mobBadge nameBadge badge badge-primary">' + player.state + '</span>';
+                    }
+
+                    let state = "";
+                    if (player.state && player.state !== "") {
+                        let stateText = states[player.state][0] + ": " + states[player.state][2];
+                        state = "/images/kde/common/states/" + player.state + ".png";
+                        state = "<span class='mobBadge stateBadge badge'><img title='" + stateText + "' style='width:25px' src='" + state + "'></span>";
+                    }
+
+                    target.append('<img cid="' + player.enemy.kdeEnemyId + '" class="animal hoverCard ' + player.enemy.type + '" src="' + fieldImage + '" hoverImageUrl="' + cardImage + '">' +
+                        '<span class="mobBadge lifeBadge badge badge-primary" attribute="life">' + player.life + '</span>' +
+                        '<span class="mobBadge staminaBadge badge badge-primary" attribute="stamina">' + player.stamina + '</span>' +
+                        '<span class="mobBadge manaBadge badge badge-primary" attribute="mana">' + player.mana + '</span>' +
+                        state +
+                        '');
+                    //target.find(".animal").addClass("boss");
+                }
+                if (isLeader) {
+                    $('.animal').css("cursor", "pointer");
+                }
+            }
+            setAnimalEventHandler();
+        }
+
+        function equalHands(hand1, hand2) {
+            if (hand1.length !== hand2.length) {
+                return false
+            }
+            for (let i = 0; i < hand1.length; i++) {
+                if (hand1[i].cardId !== hand2[i].cardId) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        rollDiceButton.on('click', function () {
+            post("&rollDice", {}, function (success, data) {
+            })
+        });
+
+        function loadOpenCards(openCards) {
+            if (equalHands(openCards, lastOpenCards)) {
+                return;
+            }
+            if (openCards.length > 0) {
+                openCardsOverlay.show();
+            } else {
+                openCardsOverlay.hide();
+            }
+            lastOpenCards = openCards;
+            openCardsField.empty();
+            for (let i = 0; i < openCards.length; i++) {
+                let card = openCards[i];
+                openCardsField.append(
+                    '<img class="cardInHand kdeCardNew" cardId=' + card.cardId + ' src="{{ backgroundCardUrl }}" data-original="' + card.imageUrl + '">'
+                );
+            }
+            lazyLoad(".cardInHand");
+        }
+
+        let contextMenuCard = undefined;
+        let contextMenuPlayer = undefined;
+        let lastDiceTime = -1;
+
+        function loadFightArea(dice, diceTime, diceRoller) {
+            const player = $('#fightDiceLottie');
+            let name = $('#diceRoller');
+            player.stop();
+
+            if (dice === 0) {
+                player.hide();
+                fightDice.hide();
+                name.hide();
+            } else if (lastDiceTime !== diceTime) {
+                lastDiceTime = diceTime;
+                player.show();
+                fightDice.hide();
+                name.hide();
+
+                setTimeout(function () {
+                    player.hide();
+                    fightDice.show();
+                    name.show();
+                    name.text(diceRoller);
+                    fightDice.html("<img src='/images/kde/common/dice/dice-" + dice + ".png'>");
+                }, 500);
+            }
+        }
+
+        let lastCustom = {};
+
+        function fade() {
+            setTimeout(function () {
+                fade();
+            }, 1000);
+
+            for (let gameUserId in lastPlayers) {
+                let player = lastPlayers[gameUserId];
+                if (player.ping !== undefined && player.ping !== "") {
+                    pingField(player.ping, player.color)
+                }
+            }
+
+            if (lastCustom.leaderPing !== undefined) {
+                pingField(lastCustom.leaderPing, "pink");
+            }
+        }
+
+        function pingField(position, color) {
+            let field = $('#' + position);
+            if (field.children().length > 0) {
+                field.effect('fade', 'slow', 1000);
+            } else {
+                field.effect('highlight', {color: color}, 1000);
+            }
+        }
+
+        function loadCustomData(custom) {
+            if (equalObjects(lastCustom, custom)) {
+                return;
+            }
+            lastCustom = custom;
+
+            $('#mergePlayer').remove();
+
+            if (custom.mergePlayerPosition !== undefined) {
+                let position = custom.mergePlayerPosition;
+                if (position) {
+                    $('#' + position).append(getHTMLMergePlayer());
+                    $('#mergePlayer').css("cursor", "pointer");
+
+                    $('#mergePlayer').on('click', function () {
+                        if (mergePlayer !== undefined && mergePlayer.hasClass("marked")) {
+                            doAction(function () {
+                                mergePlayer.removeClass("marked");
+                            });
+                            return;
+                        }
+                        mergePlayer = $(this);
+                        mergePlayer.addClass("marked");
+                    });
+                }
+            }
+        }
+
+        function equalObjects(o0, o1) {
+            if (Array.isArray(o0)) {
+                if (!Array.isArray(o1)) {
+                    return false
+                }
+                if (o0.length !== o1.length) {
+                    return false;
+                }
+                let equal = true;
+                for (let i = 0; i < o0.length; i++) {
+                    equal = equal && equalObjects(o0[i], o1[i]);
+                }
+                return equal;
+            } else if (o0 instanceof Object) {
+                if (Array.isArray(o1) || !(o1 instanceof Object)) {
+                    return false;
+                }
+                if (Object.keys(o0).length !== Object.keys(o1).length) {
+                    return false;
+                }
+                let equal = true;
+                for (let key in o0) {
+                    if (key in o1) {
+                        equal = equal && equalObjects(o0[key], o1[key]);
+                    } else {
+                        equal = false;
+                        break;
+                    }
+                }
+                return equal;
+            } else {
+                return o0 === o1;
+            }
+        }
+
+        let lastPlayersArea = [];
+        let myGameUserId = undefined;
+
+        function loadPlayers(players) {
+            if (equalObjects(players, lastPlayers)) {
+                return;
+            }
+            lastPlayers = players;
+
+            let numberOfOtherPlayers = 0;
+            let takesPart = false
+            myGameUserId = 0;
+            for (let gameUserId in players) {
+                let player = players[gameUserId];
+                if (player.id != myPlayerId) {
+                    numberOfOtherPlayers++;
+                } else {
+                    myGameUserId = 1 * gameUserId;
+                    takesPart = true;
+                }
+            }
+
+            let positions = ['lower', 'left', 'upper', 'right'];
+            for (let i = myGameUserId; i < myGameUserId + players.length; i++) {
+                setPlayerOnTable(players[i % players.length], i % players.length, positions[i - myGameUserId], takesPart);
+            }
+
+            function setPlayerOnTable(player, gameUserId, position, takesPart) {
+                if (equalObjects(lastPlayersArea[gameUserId], player)) {
+                    return;
+                }
+                lastPlayersArea[gameUserId] = player;
+                let hand = $('#' + position + "Hand");
+                let field = $('#' + position + "Field");
+                let status = $('#' + position + "Status");
+
+                hand.empty();
+                for (let i = 0; i < player.hand.length; i++) {
+                    let card = player.hand[i];
+                    let image = card.imageUrl;
+                    if (isLeader && !takesPart) {
+                        image = "{{ backgroundCardUrl }}";
+                    }
+                    hand.append(
+                        '<img class="kdeCardNew hand" cardId="' + card.cardId + '" src="{{ backgroundCardUrl }}" data-original="' + image + '" leaderOverlay = "' + card.imageUrl + '">'
+                    );
+                }
+                handleScrollbars(player, position)
+                hand.css("border-color", player.color);
+                field.empty();
+                for (let i = 0; i < player.field.length; i++) {
+                    let card = player.field[i];
+                    field.append(
+                        '<img class="kdeCardNew" cardId="' + card.cardId + '" src="{{ backgroundCardUrl }}" data-original="' + card.imageUrl + '">'
+                    );
+                }
+
+                status.empty();
+
+                let state = "";
+                if (player.state !== "") {
+                    let stateText = states[player.state][0] + ": " + states[player.state][2];
+                    state = "/images/kde/common/states/" + player.state + ".png";
+                    state = "<img title='" + stateText + "' style='margin:2px;width:30px' src='" + state + "'>";
+                }
+
+
+                let cc = (isLeader || myGameUserId == gameUserId) ? "playerName" : "";
+                status.append('<div>' +
+                    '<div class="playerStats ' + cc + '" gameUserId="' + gameUserId + '" style="white-space: nowrap;background-color:' + player.color + '">' +
+                    state +
+                    player.name + ' [' + player.characterType + '] ' +
+                    '<br>' +
+                    '<img class="smallIcon" src="/images/kde/common/icons/life.png">' + player.life +
+                    '<img class="smallIcon" src="/images/kde/common/icons/stamina.png">' + player.stamina +
+                    '<img class="smallIcon" src="/images/kde/common/icons/mana.png">' + player.mana +
+                    '<img class="smallIcon" src="/images/kde/common/icons/crystal.png">' + player.money +
+                    '</div>' +
+                    '</div>');
+                status.append('<img class="kdeCardNew character horizontal" gameUserId="' + gameUserId + '" src="{{ backgroundCharacterCardUrl }}" data-original="' + player.fullCardUrl + '">');
+            }
+
+            $('.kdeCardNew').lazyload();
+        }
+
+
+        function openDialogWithCardList(cardList, name, showRemoveButton, gameUserId, isGraveyard, isBag) {
+            let isLibrary = name === "Bibliothek";
+            modalCardHand.empty();
+            for (let key in cardList) {
+                let card = cardList[key];
+                modalCardHand.append('' +
+                    '<div title="' + card.title + '" class="kdeCard overlayCard">' +
+                    (showRemoveButton ? '<button gameUserId="' + gameUserId + '" id="removeHandCard_' + card.cardId + '" class="removeHandCardButton btn btn-danger"><span class="fas fa-skull" aria-hidden="true"></button>' : "") +
+                    (isGraveyard ? '<button gameUserId="' + gameUserId + '" id="graveyardToOpenField_' + card.cardId + '" class="graveyardToOpenField btn btn-warning"><span class="fas fa-arrow-circle-left" aria-hidden="true"></button>' : "") +
+                    (isBag ? '<button gameUserId="' + gameUserId + '" id="bagToOpenField_' + card.cardId + '" class="bagToOpenField btn btn-warning"><span class="fas fa-arrow-circle-left" aria-hidden="true"></button>' : "") +
+                    (isLibrary ? '<button gameUserId="' + gameUserId + '" id="libToOpenField_' + card.cardId + '" class="libToOpenField btn btn-warning"><span class="fas fa-arrow-circle-left" aria-hidden="true"></button>' : "") +
+                    card.title +
+                    '<br>' +
+                    '<img class="cardInHand" src="{{ backgroundCardUrl }}" data-original="' + card.imageUrl + '">' +
+                    '</div>')
+            }
+            lazyLoadChild(".kdeCard");
+            $('#modalPlayersName').html(name);
+            handleHandCardFunctions();
+            showDialog(true);
+
+            overlaySearch.unbind("keyup");
+            overlaySearch.on('keyup', function () {
+                let input = $(this).val().toLowerCase();
+                $('.overlayCard').each(function () {
+                    let title = $(this).attr("title");
+                    if (title.toLowerCase().includes(input)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+                lazyLoadChild(".kdeCard");
+            })
+        }
+
+        function openDialogWithMaps(mapList) {
+            modalCardHand.empty();
+            modalCardHand.append("<table class='table table-bordered border-light table-dark table-sm'>");
+            for (let key in mapList) {
+                let map = mapList[key];
+                modalCardHand.find("table").append('' +
+                    '<tr><td>' +
+                    '[' +
+                    map.boardId +
+                    '] ' +
+                    '</td><td>' +
+                    map.title +
+                    '</td><td>' +
+                    '<button title="' + map.title + '" class="selectMap btn btn-outline-danger" mapId="' + map.boardId + '">Auswählen</button>' +
+                    '</td></tr>')
+            }
+            $('#modalPlayersName').html("Maps");
+            modalCardHand.append("</ul>");
+            showDialog(true);
+
+            overlaySearch.unbind("keyup");
+            overlaySearch.on('keyup', function () {
+                let input = $(this).val().toLowerCase();
+                $('.selectMap').each(function () {
+                    let title = $(this).attr("title");
+                    if (title.toLowerCase().includes(input)) {
+                        $(this).parent().parent().show();
+                    } else {
+                        $(this).parent().parent().hide();
+                    }
+                });
+            })
+            let selectMap = $('.selectMap');
+            selectMap.unbind("click");
+            selectMap.on('click', function () {
+                let boardId= $(this).attr("mapId");
+                let title= $(this).attr("title");
+
+                let r = confirm("Wechsel zu " + title + "?");
+                if (r === true) {
+                    let data = {
+                        "boardId": boardId,
+                    };
+                    post("&changeBoard", data, function (success, data) {
+                    })
+                }
+            })
+        }
+
+        let isFullscreen = false;
+
+        body.unbind("keyup");
+        body.on("keyup", function (e) {
+            if (e.which === 27 && imagePreviewModal.is(":visible")) {
+                blurBackground(false);
+                imagePreviewModal.hide();
+            } else if (e.which === 27 && $('#modalCharacterEntry').is(":visible")) {
+                showDialog(false);
+            } else if (e.which === 77) { // m
+                isFullscreen = !isFullscreen;
+                let upperBoard = $('#upperBoard');
+                if (isFullscreen) {
+                    upperBoard.css("margin", "0");
+                    upperBoard.css("height", "100vh");
+                } else {
+                    upperBoard.css("margin", "170px 165px 170px 165px");
+                    upperBoard.css("height", "calc(100vh - 170px - 170px)");
+                }
+            } else if (e.which === 27) {
+                $('.contextMenu').hide();
+            }
+            // 171 + 107
+            // 173 - 109
+            if (e.which === 171 || e.which === 173 || e.which === 107 || e.which === 109) {
+                handlePlusMinus(e.which);
+            }
+
+            // dropdown opened or not
+            if ((e.which >= 65 && e.which <= 90) || [8, 222, 59, 219, 63].includes(e.which)) {
+                applyContextFilter(e);
+            }
+        });
+        let filterFieldContextMenu = $('#filterFieldContextMenu');
+
+        $('.hiddenField').on('contextmenu', function (e) {
+            filterFieldContextMenu.text("");
+            $('.enemySpawnButton').show();
+        });
+
+        function applyContextFilter(e) {
+            let key = e.key;
+            let newText = filterFieldContextMenu.text();
+            //backspace
+            if (e.which === 8) {
+                if (newText === "") {
+                    return;
+                }
+                newText = newText.slice(0, -1);
+            } else {
+                newText = newText + key;
+            }
+            filterFieldContextMenu.text(newText);
+            $('.enemySpawnButton').each(function () {
+                let title = $(this).attr("name");
+                if (title === undefined) {
+                    return;
+                }
+                let show = title.toLowerCase().includes(newText.toLowerCase()) || newText.length === 0;
+                if (show) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        function handlePlusMinus(key) {
+            if (hoveredMobBadgeForLeader === undefined) {
+                return;
+            }
+            let mode = ""
+            let action = ""
+            let attribute = hoveredMobBadgeForLeader.attr("attribute");
+
+            if (key === 171 || key === 107) {
+                // plus
+                action = "add"
+            } else {
+                // minus
+                action = "sub"
+            }
+
+            let data = {
+                "coo": hoveredMobBadgeForLeader.parent().attr("id"),
+                "action": action,
+                "attribute": attribute,
+            };
+            post("&fightArea", data, function (success, data) {
+            })
+        }
+
+        function blurBackground(blur = true) {
+            let filter = blur ? 'blur(5px)' : '';
+            leaderBoard.css('filter', filter);
+            nav.css('filter', filter);
+            mainView.css('filter', filter);
+            tabBar.css('filter', filter);
+        }
+
+        cancelButton.on('click', function () {
+            showDialog(false);
+        });
+
+        function showDialog(show) {
+            if (show) {
+                blurBackground();
+                dialog.show();
+            } else {
+                blurBackground(false);
+                dialog.hide();
+            }
+        }
+
+        function setAlive(_isAlive) {
+            if (stoppedFromRemote) {
+                _isAlive = false;
+            }
+            isAlive = _isAlive;
+            let value = isAlive ? "Online" : "Offline";
+            state.html(value);
+            state.removeClass("Online");
+            state.removeClass("Offline");
+            state.addClass(value);
+
+            if (!_isAlive) {
+                mainView.hide();
+                dialog.hide();
+                leaderBoard.hide();
+                blurBackground(false);
+            } else {
+                mainView.css("display", "flex");
+                mainView.show();
+                leaderBoard.css("display", "flex");
+                leaderBoard.show();
+            }
+        }
+
+        function handleHandCardFunctions() {
+            let graveyardToOpenFields = $('.graveyardToOpenField');
+            graveyardToOpenFields.unbind('click');
+            graveyardToOpenFields.on('click', function () {
+                let id = $(this).attr('id').split('_')[1];
+                $(this).attr("disabled", true);
+                let that = $(this);
+                let data = {
+                    "cardId": id,
+                    "from": "graveyard",
+                    "target": "openCards",
+                };
+                post("&moveCard", data, function (success, data) {
+                    that.parent().remove()
+                })
+            });
+
+            let bagToOpenFields = $('.bagToOpenField');
+            bagToOpenFields.unbind('click');
+            bagToOpenFields.on('click', function () {
+                let id = $(this).attr('id').split('_')[1];
+                $(this).attr("disabled", true);
+                let that = $(this);
+                let data = {
+                    "cardId": id,
+                    "from": "bag",
+                    "target": "openCards",
+                };
+                post("&moveCard", data, function (success, data) {
+                    that.parent().remove()
+                })
+            });
+
+            let libToOpenField = $('.libToOpenField');
+            libToOpenField.unbind('click');
+            libToOpenField.on('click', function () {
+                let id = $(this).attr('id').split('_')[1];
+                $(this).attr("disabled", true);
+                let that = $(this);
+                let data = {
+                    "cardId": id,
+                    "from": "library",
+                    "target": "openCards",
+                };
+                post("&moveCard", data, function (success, data) {
+                    that.parent().remove()
+                })
+            });
+
+            let hoverCards = $('.hoverCard');
+            hoverCards.on('mouseover', function () {
+
+                if ($(this).attr("nohover")) {
+                    return;
+                }
+                let dataOriginal = $(this).attr("hoverImageUrl");
+                characterHoverViewImage.attr("src", "");
+                characterHoverViewImage.attr("src", dataOriginal);
+                if ($(this).hasClass("playerIcon")) {
+                    characterHoverView.addClass("horizontal");
+                } else {
+                    characterHoverView.removeClass("horizontal");
+                }
+                characterHoverView.show();
+            });
+            hoverCards.on('mouseout', function () {
+                characterHoverView.hide();
+            });
+            hoverCards.mousemove(function (event) {
+                if ($(this).attr("nohover")) {
+                    return;
+                }
+                let offsetX = 350;
+                let offsetY = 412;
+
+                if ($(this).hasClass("playerIcon")) {
+                    return;
+                }
+                let x = event.pageX - offsetX;
+                if (x < 0) {
+                    x = event.pageX + 50;
+                }
+                characterHoverView.css("left", x);
+                characterHoverView.css("top", Math.max(0, Math.min(event.pageY - 170, $(window).height() - offsetY)));
+                characterHoverView.show();
+            });
+
+
+            $('body').on('click', function (e) {
+                hideOverlays();
+            });
+
+            // v2
+            let everykdeCardNew = $('.kdeCardNew');
+
+            everykdeCardNew.on('mouseover', function () {
+                if ($(this).attr("nohover")) {
+                    return;
+                }
+                if ($(this).attr("src") === "{{ backgroundCardUrl }}") {
+                    lazyLoadRaw($(this));
+                }
+                let dataOriginal = $(this).attr("data-original");
+                if (isLeader && $(this).hasClass("hand")) {
+                    dataOriginal = $(this).attr("leaderOverlay");
+                }
+                characterHoverViewImage.attr("src", "");
+                characterHoverViewImage.attr("src", dataOriginal);
+                if ($(this).hasClass("horizontal")) {
+                    characterHoverView.addClass("horizontal");
+                } else {
+                    characterHoverView.removeClass("horizontal");
+                }
+                characterHoverView.show();
+            });
+
+
+            everykdeCardNew.mousemove(function (event) {
+                if ($(this).attr("nohover")) {
+                    return;
+                }
+                let offsetX = 350;
+                let offsetY = 412;
+
+                if ($(this).hasClass("horizontal")) {
+                    // handle horizontal view
+                    offsetX = 580;
+                    offsetY = 410;
+                }
+                let x = event.pageX - offsetX;
+                if (x < 0) {
+                    x = event.pageX + 50;
+                }
+                characterHoverView.css("left", x);
+                characterHoverView.css("top", Math.max(0, Math.min(event.pageY - 170, $(window).height() - offsetY)));
+                characterHoverView.show();
+            });
+
+            everykdeCardNew.on('mouseout', function () {
+                characterHoverView.hide();
+            });
+
+            let contextMenuActionItem = $('.contextMenuAction');
+            contextMenuActionItem.unbind('click');
+            contextMenuActionItem.on('click', function (e) {
+                contextMenuAction($(this).attr("id"));
+            });
+
+            function contextMenuAction(action) {
+                let target = undefined;
+                switch (action) {
+                    case "contextMenuHand":
+                        target = "hand";
+                        break;
+                    case "contextMenuPlay":
+                        target = "field";
+                        break;
+                    case "contextMenuGraveyard":
+                        target = "graveyard";
+                        break;
+                    case "contextMenuLibrary":
+                        target = "library";
+                        break;
+                    case "contextMenuBag":
+                        target = "bag";
+                        break;
+                }
+
+                if (["advancedSkillOne", "advancedSkillTwo", "advancedSkillThree"].includes(action)) {
+                    let data = {
+                        "gameUserId": contextMenuCard.attr('gameUserId'),
+                        "skill": action,
+                    };
+                    post("&setSkill", data, function (success, data) {
+                    })
+
+
+                }
+
+                if (target) {
+                    contextMenuCard.attr("nohover", 1);
+                    let data = {
+                        "cardId": contextMenuCard.attr("cardId"),
+                        "selectedPlayerId": myPlayerId,
+                        "target": target,
+                    };
+                    post("&moveCard", data, function (success, data) {
+                    })
+                }
+            }
+
+            everykdeCardNew.unbind('contextmenu');
+            everykdeCardNew.on('contextmenu', function (e) {
+                hideOverlays();
+                if ($(this).hasClass("noContextMenu")) {
+                    return;
+                }
+                contextMenuCard = $(this);
+                let maxX = 250;
+
+                let contextMenu = $('#cardContextMenu');
+                if ($(this).hasClass("character")) {
+                    contextMenu = $('#characterContextMenu');
+                    // handle character context menu skills
+                    let gameUserId = $(this).attr("gameUserId");
+                    let skills = lastPlayers[gameUserId].skills;
+
+                    function handleSkill(skill, id) {
+                        let element = $('#' + id);
+                        element.text(skill.text);
+                        element.attr("title", skill.text);
+                        element.css("color", skill.enabled ? "" : "brown")
+                    }
+
+                    handleSkill(skills.baseSkill0, 'contextMenuBaseSkill0');
+                    handleSkill(skills.baseSkill1, 'contextMenuBaseSkill1');
+                    handleSkill(skills.advancedSkillOne, 'contextMenuAdvancedSkillOne');
+                    handleSkill(skills.advancedSkillTwo, 'contextMenuAdvancedSkillTwo');
+                    handleSkill(skills.advancedSkillThree, 'contextMenuAdvancedSkillThree');
+                    maxX = 500;
+                }
+                contextMenu.show();
+
+                let x = event.pageX;
+                if (x > $(window).width() - maxX) {
+                    x = $(window).width() - maxX;
+                }
+                let y = event.pageY;
+                if (y > $(window).height() - 220) {
+                    y = $(window).height() - 220;
+                }
+                contextMenu.css("top", y);
+                contextMenu.css("left", x);
+
+                e.preventDefault();
+            });
+            // playercontextmenu
+
+            let players = $('.playerName');
+            players.unbind('contextmenu');
+            players.on('contextmenu', function (e) {
+                hideOverlays();
+                let gameUserId = $(this).attr("gameUserId");
+                contextMenuPlayer = lastPlayers[gameUserId];
+
+                let subdowns = $('.dropdown-submenu');
+
+                let x = event.pageX;
+
+                if (x > $(window).width() - 325) {
+                    subdowns.removeClass("dropend");
+                    subdowns.addClass("dropstart");
+                } else {
+                    subdowns.addClass("dropend");
+                    subdowns.removeClass("dropstart");
+                }
+                if (x > $(window).width() - 220) {
+                    x = $(window).width() - 220;
+                }
+                let y = event.pageY;
+                y = Math.min($(window).height() - 250, y);
+                let contextMenu = $('#playerContextMenu');
+                contextMenu.show();
+                contextMenu.css("top", y);
+                contextMenu.css("left", x);
+                e.preventDefault();
+            });
+            // v2 end
+        }
+
+        $('#imagePreviewCloseButton').on('click', function () {
+            imagePreviewModal.hide();
+            blurBackground(false);
+        });
+
+        $('#graveyardButton').on('click', function () {
+            openDialogWithCardList(graveyard, "Friedhof", false, 1, true, false);
+        });
+
+        $('#bagButton').on('click', function () {
+            openDialogWithCardList(bag, "Tasche", false, 1, false, true);
+        });
+
+        $('.doEnemyButton').on('click', function () {
+
+            let action = $(this).attr("action");
+            let attribute = $(this).attr("attribute");
+
+            let coo = activeContextMenuAnimal.parent().attr("id");
+            let data = {
+                "coo": coo,
+                "action": action,
+                "attribute": attribute
+            };
+            post("&fightArea", data, function (success, data) {
+                activeContextMenuAnimal = undefined;
+                $('#enemyContextMenu').hide();
+            })
+        });
+
+
+        $('#highlightButton').on('click', function () {
+            get("&highlightField&pos=" + activeContextMenuField.attr('id'), function (success, data) {
+            });
+        });
+
+
+        $('#removeEnemy').on('click', function () {
+            let data = {
+                "coo": activeContextMenuAnimal.parent().attr("id"),
+                "action": "remove",
+                "attribute": "", // unneeded
+            };
+            post("&fightArea", data, function (success, data) {
+                activeContextMenuAnimal = undefined;
+                $('#enemyContextMenu').hide();
+                characterHoverView.hide();
+            })
+        });
+
+        $('.enemySpawnButton').on('click', function () {
+            get("&setFigure&enemyId=" + $(this).attr("customValue") + "&to=" + activeContextMenuField.attr("id"), function (success, data) {
+            });
+        });
+
+        $('.doButton').on('click', function () {
+            let attribute = $(this).attr("attribute");
+            let action = $(this).attr("action");
+            let value = contextMenuPlayer[attribute];
+            if (action === "add") {
+                value = parseInt(value) + 1;
+            } else {
+                value = Math.max(0, parseInt(value) - 1);
+            }
+            let data = {
+                "playerId": contextMenuPlayer.id,
+                "value": value,
+                "attribute": attribute,
+            };
+            post("&adjustAttribute", data, function (success, data) {
+            })
+        });
+
+        $('.stateButton').on('click', function () {
+            let data = {
+                "playerId": contextMenuPlayer.id,
+                "value": $(this).attr("customValue"),
+                "attribute": "state",
+            };
+            post("&adjustAttribute", data, function (success, data) {
+            })
+        });
+
+        $('.drawCardButton').on('click', function () {
+            let data = {
+                "selectedPlayerId": contextMenuPlayer.id,
+                "target": "hand",
+                "from": "library",
+            };
+            post("&moveCard", data, function (success, data) {
+            })
+        });
+
+        $('.stateButtonEnemy').on('click', function () {
+            let animalId = activeContextMenuAnimal.parent().attr("id");
+            let data = {
+                "enemyId": animalId,
+                "value": $(this).attr("customValue"),
+                "attribute": "state",
+            };
+            post("&adjustEnemyAttribute", data, function (success, data) {
+            })
+        });
+
+        $('#mergePlayersButton').on('click', function () {
+            get("&setMergePlayer&to=" + activeContextMenuField.attr("id"), function (success, data) {
+            });
+        });
+        $('#splitPlayersButton').on('click', function () {
+            get("&removeMergePlayer", function (success, data) {
+            });
+        });
+
+
+        {% if isLeader %}
+        let cards = {{ cards|json_encode|raw }};
+        let leaderImg = $('#leaderImg');
+        $(document).ready(function () {
+            lootCardButton.on('click', function () {
+                let data = {
+                    "count": $('#inputEnemyLife').val(),
+                };
+                post("&drawLootCard", data, function (success, data) {
+                });
+            });
+            libraryButton.on('click', function () {
+                get("&library", function (success, data) {
+                    if (!success) {
+                        return;
+                    }
+                    openDialogWithCardList(data.cards, "Bibliothek", false, 1, false, false);
+                })
+            });
+            mapButton.on('click', function () {
+                get("&maps", function (success, data) {
+                    if (!success) {
+                        return;
+                    }
+                    openDialogWithMaps(data.maps);
+                })
+            });
+        });
+        {% endif %}
+    });
+</script>
+
+<!--leader start-->
+<!--leader end-->
+
+<div id="characterHoverView" class="kdeCard contextMenu">
+    <img id="characterHoverViewImage" src="{{ backgroundCardUrl }}">
+</div>
+
+<div id="fieldContextMenu" class="dropdown-menu contextMenu">
+    <div class="dropdown-item" id="filterContextMenu" href="#">
+        Filter: <span id="filterFieldContextMenu"></span>
+    </div>
+    <a class="dropdown-item" id="highlightButton" href="#">
+        <span class="fas fa-highlighter" aria-hidden="true"></span>
+        Ping
+    </a>
+    <a class="dropdown-item leaderContextMenu" id="splitPlayersButton" href="#">
+        <span class="fas fa-expand-arrows-alt" aria-hidden="true"></span>
+        Spieler trennen
+    </a>
+    <a class="dropdown-item leaderContextMenu" id="mergePlayersButton" href="#">
+        <span class="fas fa-layer-group" aria-hidden="true"></span>
+        Spieler vereinen
+    </a>
+    <div id="spawnEnemySubmenu" class="leaderContextMenu">
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <span class="fas fa-dragon" aria-hidden="true"></span>
+                Gegner
+            </a>
+            <ul class="dropdown-menu">
+                {% if enemies is defined %}
+                    {% for enemy in enemies %}
+                        <li title="{{ enemy.name }}">
+                            <a class="dropdown-item enemySpawnButton" name="{{ enemy.name }}"
+                               customValue="{{ enemy.kdeEnemyId }}">
+                                {{ enemy.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div id="spawnPetSubmenu" class="leaderContextMenu">
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <span class="fas fa-paw" aria-hidden="true"></span>
+                Pets
+            </a>
+            <ul class="dropdown-menu">
+                {% if pets is defined %}
+                    {% for pet in pets %}
+                        <li title="{{ pet.name }}">
+                            <a class="dropdown-item enemySpawnButton" name="{{ pet.name }}"
+                               customValue="{{ pet.kdeEnemyId }}">
+                                {{ pet.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    <div id="spawnEventSubmenu" class="leaderContextMenu">
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <span class="fas fa-beer" aria-hidden="true"></span>
+                Events
+            </a>
+            <ul class="dropdown-menu">
+                {% if events is defined %}
+                    {% for event in events %}
+                        <li title="{{ event.name }}">
+                            <a class="dropdown-item enemySpawnButton" name="{{ event.name }}"
+                               customValue="{{ event.kdeEnemyId }}">
+                                {{ event.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="editEnemySubmenu" class="leaderContextMenu">
+
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <img class="dropdownIcon" src="/images/kde/common/icons/life.png">
+                Leben
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="add" attribute="life">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="sub" attribute="life">
+                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <img class="dropdownIcon" src="/images/kde/common/icons/stamina.png">
+                Ausdauer
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="add" attribute="stamina">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="sub" attribute="stamina">
+                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <img class="dropdownIcon" src="/images/kde/common/icons/mana.png">
+                Mana
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="add" attribute="mana">
+                        <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item doEnemyButton" action="sub" attribute="mana">
+                        <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="dropdown-submenu dropend">
+            <a class="dropdown-item dropdown-toggle">
+                <span class="fas fa-info-circle" aria-hidden="true"></span>
+                Status
+            </a>
+            <ul class="dropdown-menu">
+                <li title="Status entfernen">
+                    <a class="dropdown-item stateButtonEnemy" customValue="">
+                        <span class="fas fa-times-circle" aria-hidden="true"></span>
+                    </a>
+                </li>
+                {% for key, state in states %}
+                    <li title="{{ state[0] }}: {{ state[2] }}">
+                        <a class="dropdown-item stateButtonEnemy" customValue="{{ key }}">
+                            <img class="dropdownIcon" src="/images/kde/common/states/{{ state[1] }}">
+                            {{ state[0] }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <a class="dropdown-item" id="removeEnemy" href="#">
+            <span class="fas fa-skull" aria-hidden="true"></span>
+            Entfernen
+        </a>
+    </div>
+
+</div>
+
+<div id="weatherView"></div>
+<div id="cursorView">
+    <span class="fas fa-hand-pointer" aria-hidden="true"></span>
+</div>
+<div id="diceView" style="display: inline-flex">
+    <div id="fightDice">
+    </div>
+    <div id="diceRoller">
+    </div>
+</div>
+<div id="sharedItemsView">
+    <!--<div><img class="smallIcon" src="/images/kde/common/icons/phoenix_feather.png"> 0</div>-->
+</div>
+<div id="infoView">
+    <div>
+        <a href="https://www.treibaer.de/games/Kristalle_der_Ewigkeit_-_Anleitung.pdf" target="_blank"><span
+                    class="fas fa-book"
+                    aria-hidden="true"></span></a>
+    </div>
+</div>
+
+{% include '/play/context_menus.html.twig' %}

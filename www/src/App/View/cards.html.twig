@@ -1,0 +1,209 @@
+<style>
+    #drop_zone {
+        border: 2px solid #1b6d85;
+        height: 100px;
+        text-align: center;
+        overflow-y: auto;
+    }
+
+    .cardOverview {
+        width: 200px;
+    }
+    .cardOverview img {
+        width: 100%;
+    }
+
+    #file-upload {
+        width: 94%;
+        margin-left: 3%;
+    }
+
+</style>
+<div class="container p-4">
+    <div id="file-upload p-1">
+        <div id="drop_area">
+            <div id="drop_zone" class="drop_zone border rounded shadow-sm">
+                DROP HERE
+                <ul>
+                    <output id="list"></output>
+                </ul>
+            </div>
+            <input type="file" id="files" multiple name="files[]" accept="" style="display:none;"/>
+
+            <div class="margin row p-1">
+                <button type="button" id="resetButton" class="col-sm-4 btn btn-danger">Leeren</button>
+                <button type="button" class="col-sm-4 btn btn-success"
+                        onclick="document.getElementById('files').click();">Datei auswählen
+                </button>
+                <button type="button" id="expressOrderUploadButton" class="col-sm-4 btn btn-primary">Hochladen</button>
+            </div>
+        </div>
+    </div>
+    <br>
+    Filter: <input id="filterByTitleInput" type="text">
+    <button id="resetFilterButton" class="btn btn-warning">Leeren</button>
+    <br><br>
+    <div style="display:flex;flex-wrap: wrap">
+        {% for card in allCards %}
+            <div class="cardOverview border" title="{{ card.title }}" style="white-space: nowrap;">
+                <button cardId="{{ card.cardId }}" class="btn btn-sm btn-danger buttonRemove"><span
+                            class="fas fa-trash" aria-hidden="true"></span></button>
+                {{ card.title }}
+                <div class="kdeCard">
+                    <img src="{{ backgroundCardUrl }}" data-original="{{ card.imageUrl }}">
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+<script>
+
+    var $container = $('#file-upload');
+    var multipleFiles = [];
+    var lastModified = 0;
+    let filterByTitleInput = $('#filterByTitleInput');
+    let resetFilterButton = $('#resetFilterButton');
+    let buttonRemove = $('.buttonRemove');
+    var size = 0;
+
+    $(document).ready(function () {
+        init();
+        $('.kdeCard img').lazyload();
+
+        $('.kdeCard img').on('mouseover', function () {
+            let bg = "{{ backgroundSmallCardUrl }}";
+            let bg2 = "{{ backgroundCardUrl }}";
+            if (($(this).attr("src") === bg || $(this).attr("src") === bg2) && $(this).attr("data-original")) {
+                $(this).lazyload();
+            }
+        });
+        resetFilterButton.on('click', function () {
+            filterByTitleInput.val("");
+            $('.cardOverview').show();
+        });
+        buttonRemove.on('click', function () {
+            remove($(this).attr('cardId'));
+        });
+
+        filterByTitleInput.on('keyup', function () {
+            let term = filterByTitleInput.val();
+            console.log(term);
+            $('.cardOverview').each(function () {
+                let title = $(this).attr("title");
+                let show = title.toLowerCase().includes(term.toLowerCase()) || term.length === 0;
+                if (show) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+
+        });
+    });
+
+    function remove(cardId) {
+        let data = {
+            'cardId': cardId,
+        };
+        if (confirm('Wirklich löschen?')) {
+            $.post('/api/kde/card/remove', data, function (data) {
+                location.reload();
+            });
+        }
+    }
+
+    function handleFiles(files) {
+        // files is a FileList of File objects. ListEntry some properties.
+        var output = [];
+        for (var i = 0; i < files.length; i++) {
+            var currentFile = files[i];
+            output.push('<li><strong>', (currentFile.name), '</strong> - ', currentFile.size, ' bytes</li>');
+            var reader = new FileReader();
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    lastModified = currentFile.lastModified;
+                    size = currentFile.size;
+                    multipleFiles.push(theFile);
+                };
+            })(currentFile);
+            reader.readAsBinaryString(currentFile);
+        }
+        return output;
+    }
+
+    function resetFileList() {
+        multipleFiles = [];
+        document.getElementById('list').innerHTML = '';
+    }
+
+    function handleFileDragDrop(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        var files = evt.dataTransfer.files;
+        output = handleFiles(files);
+        document.getElementById('list').innerHTML = document.getElementById('list').innerHTML + '' + output.join('') + '';
+    }
+
+    function handleDragOver(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = 'copy';
+    }
+
+
+    function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+        output = handleFiles(files);
+        document.getElementById('list').innerHTML = document.getElementById('list').innerHTML + '' + output.join('') + '';
+    }
+
+    function init() {
+        let dropZone = document.getElementById('drop_zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('drop', handleFileDragDrop, false);
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+        $('#resetButton').on('click', function () {
+            resetFileList();
+        });
+        let type = "{{ type }}";
+        $('#expressOrderUploadButton').on('click', function () {
+            if (multipleFiles.length > 0) {
+                let data = new FormData();
+                data.append("numberOfFiles", "" + multipleFiles.length);
+                for (let i = 0; i < multipleFiles.length; i++) {
+                    let file = multipleFiles[i];
+                    data.append('file' + i, file);
+                    data.append('lastModified' + i, file.lastModified / 1000);
+                }
+                $.ajax({
+                    url: '/api/kde/card/upload?type=' + type,
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false
+                })
+                    .done(function (response) {
+                        if (0 === response.length) {
+                            console.log("fail");
+                        } else {
+                            console.log("success");
+                            location.reload();
+                        }
+                        console.log(response);
+                    })
+                    .fail(function (response) {
+                        console.log("fail");
+                        console.log(response);
+                    })
+                    .always(function () {
+                    });
+            }
+        });
+
+    }
+</script>

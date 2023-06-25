@@ -1,0 +1,61 @@
+<div id="modalEnemyEntry" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="headline">Neuer Charakter</h5>
+                <button type="button" id="dialogCloseButton" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class=" modalCharacterEntryTable {% if darkMode %}table-dark{% endif %}" style="width: 100%">
+                    <tr>
+                        <td>
+                            Karte
+                            <img id="fullCardUrl" width="100px;" src="/images/kde-icon.png">
+                            <div id="file-upload">
+                                <div id="drop_area">
+                                    <input type="file" id="files" name="files[]" accept="" style="display:none;"/>
+
+                                    <button style="width:100%" type="button" class="btn btn-success"
+                                            onclick="document.getElementById('files').click();">Bild auswählen
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            Feld
+                            <img id="fieldImageUrl" width="100px;" src="/images/kde-icon.png">
+                            <div id="file-upload">
+                                <div id="drop_area">
+                                    <input type="file" id="files2" name="files[]" accept="" style="display:none;"/>
+
+                                    <button style="width:100%" type="button" class="btn btn-success"
+                                            onclick="document.getElementById('files2').click();">Bild auswählen
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td colspan="5">
+                            <table>
+                                <tr>
+                                    <td>Name</td>
+                                    <td><input id="name" type="text"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        {{ select("Leben", "life", 1, 9) | raw }}
+                        {{ select("Ausdauer", "stamina", 0, 9) | raw }}
+                        {{ select("Mana", "mana", 0, 9) | raw }}
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="dialogCancelButton" class="btn btn-secondary" data-dismiss="modal">Abbrechen</button>
+                <button type="button" id="buttonSaveEnemy" class="btn btn-success">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>

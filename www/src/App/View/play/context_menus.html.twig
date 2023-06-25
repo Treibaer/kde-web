@@ -1,0 +1,163 @@
+
+<div id="cardContextMenu" class="dropdown-menu contextMenu">
+    <a class="dropdown-item contextMenuAction" id="contextMenuPlay" href="#">
+        <span class="fas fa-arrow-circle-up" aria-hidden="true"></span>
+        Spielen
+    </a>
+    <a class="dropdown-item contextMenuAction" id="contextMenuHand" href="#">
+        <span class="fas fa-arrow-circle-down" aria-hidden="true"></span>
+        Hand
+    </a>
+    <a class="dropdown-item contextMenuAction" id="contextMenuLibrary" href="#">
+        <span class="fas fa-sim-card" aria-hidden="true"></span>
+        Bibliothek
+    </a>
+    <a class="dropdown-item contextMenuAction" id="contextMenuBag" href="#">
+        <span class="fas fa-shopping-bag" aria-hidden="true"></span>
+        Tasche
+    </a>
+    <a class="dropdown-item contextMenuAction" id="contextMenuGraveyard" href="#">
+        <span class="fas fa-skull" aria-hidden="true"></span>
+        Friedhof
+    </a>
+</div>
+
+<div id="characterContextMenu" class="dropdown-menu contextMenu">
+    <a class="dropdown-item contextMenuAction" href="#" style="font-size: 10pt">
+        <span id="contextMenuBaseSkill0">
+            Mittlerer Heileffekt:(Leben +1 und Mana +1)oder (Leben +1 und Ausdauer +1)oder (Mana +1 und Ausdauer +1)
+        </span>
+    </a>
+    <a class="dropdown-item contextMenuAction" href="#" style="font-size: 10pt">
+        <span id="contextMenuBaseSkill1">
+            Mittlerer Heileffekt:(Leben +1 und Mana +1)oder (Leben +1 und Ausdauer +1)oder (Mana +1 und Ausdauer +1)
+        </span>
+    </a>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item contextMenuAction" id="advancedSkillOne" style="font-size: 10pt">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <span id="contextMenuAdvancedSkillOne">
+                Mittlerer Heileffekt:(Leben +1 und Mana +1)oder (Leben +1 und Ausdauer +1)oder (Mana +1 und Ausdauer +1)
+            </span>
+        </a>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item contextMenuAction" id="advancedSkillTwo"  style="font-size: 10pt">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <span id="contextMenuAdvancedSkillTwo">
+                Mittlerer Heileffekt:(Leben +1 und Mana +1)oder (Leben +1 und Ausdauer +1)oder (Mana +1 und Ausdauer +1)
+            </span>
+        </a>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item contextMenuAction" id="advancedSkillThree" style="font-size: 10pt">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            <span id="contextMenuAdvancedSkillThree">
+                Mittlerer Heileffekt:(Leben +1 und Mana +1)oder (Leben +1 und Ausdauer +1)oder (Mana +1 und Ausdauer +1)
+            </span>
+        </a>
+    </div>
+</div>
+
+<div id="playerContextMenu" class="dropdown-menu contextMenu">
+    <a class="dropdown-item drawCardButton" id="draw" href="#">
+        <span class="fas fa-hand-lizard" aria-hidden="true"></span>
+        Ziehen
+    </a>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item dropdown-toggle">
+            <span class="fas fa-info-circle" aria-hidden="true"></span>
+            Status
+        </a>
+        <ul class="dropdown-menu">
+            <li title="Status entfernen">
+                <a class="dropdown-item stateButton" customValue="">
+                    <span class="fas fa-times-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+            {% for key, state in states %}
+                <li title="{{ state[0] }}: {{ state[2] }}">
+                    <a class="dropdown-item stateButton" customValue="{{ key }}">
+                        <img class="dropdownIcon" src="/images/kde/common/states/{{ state[1] }}">
+                        {{ state[0] }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item dropdown-toggle">
+            <img class="dropdownIcon" src="/images/kde/common/icons/life.png">
+            Leben
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item doButton" action="add" attribute="life">
+                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item doButton" action="sub" attribute="life">
+                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item dropdown-toggle">
+            <img class="dropdownIcon" src="/images/kde/common/icons/stamina.png">
+            Ausdauer
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item doButton" action="add" attribute="stamina">
+                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item doButton" action="sub" attribute="stamina">
+                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item dropdown-toggle">
+            <img class="dropdownIcon" src="/images/kde/common/icons/mana.png">
+            Mana
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item doButton" action="add" attribute="mana">
+                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item doButton" action="sub" attribute="mana">
+                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="dropdown-submenu dropend">
+        <a class="dropdown-item dropdown-toggle">
+            <img class="dropdownIcon" src="/images/kde/common/icons/crystal.png">
+            Kristalle
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item doButton" action="add" attribute="money">
+                    <span class="fas fa-plus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item doButton" action="sub" attribute="money">
+                    <span class="fas fa-minus-circle" aria-hidden="true"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

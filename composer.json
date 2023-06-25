@@ -1,0 +1,14 @@
+{
+  "require": {
+    "php": ">=7.0",
+    "twig/twig": "~2.0",
+    "jms/serializer": "^1.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "KDE\\": "www/src/App",
+      "KDEApi\\": "www/src/Api",
+      "TBCore\\": "www/src/Core"
+    }
+  }
+}

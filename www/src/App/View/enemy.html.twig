@@ -1,0 +1,190 @@
+<script src="/thirdparty/jquery-ui-1.12.1.min.js"></script>
+<link rel="stylesheet" href="/thirdparty/jquery-ui-1.12.1.min.css">
+<style>
+    #enemyTable .fieldIcon {
+        height:100px;
+    }
+    #enemyTable .cardPreview{
+        height:100px;
+    }
+    .enemyField {
+        width: 200px;
+    }
+</style>
+<div id="enemyTable" class="container p-4">
+    <div class="row">
+        {% for enemy in enemies %}
+            <div class="enemyField border" style="width: 210px">
+                <button enemyId="{{ enemy.kdeEnemyId }}" class="btn btn-sm btn-success buttonEdit"><span class="fas fa-pencil-alt" aria-hidden="true"></span></button> {{ enemy.name }}<br>
+                Leben: {{ enemy.life }} <br>
+                <a href="{{ enemy.fullCardUrl }}" target="_blank"><img class="cardPreview" src="{{ backgroundSmallCardUrl }}" data-original="{{ enemy.fullCardUrl }}"></a>
+                <img src="{{ backgroundSmallCardUrl }}" data-original="{{ enemy.fieldImageUrl }}" class="fieldIcon">
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <button type="button" enemyId="-1" class="btn btn-success buttonEdit">Neu</button>
+</div>
+<br>
+{% include '/dialog_enemy.html.twig' %}
+
+<script>
+    $(document).ready(function () {
+        $('img').lazyload();
+        var allEnemies = JSON.parse('{{ enemies | json_encode |raw }}');
+        var dummyEnemy = JSON.parse('{{ dummyEnemy | json_encode |raw }}');
+
+        var selectedEnemyId = -1;
+
+        var dialog = $('#modalEnemyEntry'),
+            characterTable = $('#enemyTable'),
+            nav = $('.blog-header'),
+            tabBar = $('#tabBar'),
+            headline = $('#headline'),
+            name = $('#name'),
+            cardImage = $('#fullCardUrl'),
+            fieldImage = $('#fieldImageUrl')
+        ;
+
+        var editButtons = $('.buttonEdit'),
+            closeButton = $('#dialogCloseButton'),
+            cancelButton = $('#dialogCancelButton'),
+            saveButton = $('#buttonSaveEnemy');
+
+        function saveCharacter() {
+            let enemy = {};
+
+            for (let key in dummyEnemy) {
+                enemy[key] = $('#' + key).val();
+            }
+
+            enemy.kdeEnemyId = selectedEnemyId;
+            enemy.type = dummyEnemy.type;
+
+            $.post('/api/kde/enemy/edit', enemy, function (data) {
+                showDialog(false);
+                location.reload();
+            });
+        }
+
+        function fillDialog(enemyId) {
+            closeButton.attr("disabled", false);
+            cancelButton.attr("disabled", false);
+            saveButton.attr("disabled", false);
+
+            let enemy = dummyEnemy;
+
+            for(let i = 0; i < allEnemies.length; i++) {
+                let currentEnemy = allEnemies[i];
+                if (currentEnemy.kdeEnemyId === enemyId) {
+                    enemy = currentEnemy;
+                }
+            }
+
+            selectedEnemyId = enemyId;
+
+            headline.html(enemyId == -1 ? "Neuer Gegner" : enemy.name);
+
+            for (let key in enemy) {
+                $('#' + key).val(enemy[key]);
+            }
+            let fullCardUrl = enemy.fullCardUrl != "" ? enemy.fullCardUrl : "/images/kde-icon.png";
+            cardImage.attr("src", fullCardUrl);
+            let fieldImageUrl = enemy.fieldImageUrl != "" ? enemy.fieldImageUrl : "/images/kde-icon.png";
+            fieldImage.attr("src", fieldImageUrl);
+
+        }
+
+        function showDialog(show, characterId = -1) {
+            fillDialog(characterId);
+            if (show) {
+                blurBackground();
+                dialog.show();
+            } else {
+                blurBackground(false);
+                dialog.hide();
+            }
+        }
+
+        function blurBackground(blur = true) {
+            var filter = blur ? 'blur(5px)' : '';
+            nav.css('filter', filter);
+            characterTable.css('filter', filter);
+            tabBar.css('filter', filter);
+        }
+        let body = $('body');
+        body.unbind("keyup");
+        body.on("keyup", function (e) {
+            if (e.which === 27) {
+                showDialog(false);
+            }
+        });
+
+        editButtons.click(function () {
+            showDialog(true, $(this).attr("enemyId"));
+
+        });
+        closeButton.click(function () {
+            showDialog(false)
+        });
+        cancelButton.click(function () {
+            showDialog(false)
+        });
+        saveButton.click(function () {
+            closeButton.attr("disabled", true);
+            cancelButton.attr("disabled", true);
+            saveButton.attr("disabled", true);
+            saveCharacter();
+        });
+
+        name.on('keyup', function () {
+            headline.html(name.val());
+        });
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+        document.getElementById('files2').addEventListener('change', handleFileSelect2, false);
+
+        function handleFileSelect(evt) {
+            upload(evt.target.files[0], "fullCardUrl")
+        }
+        function handleFileSelect2(evt) {
+            upload(evt.target.files[0], "fieldImageUrl")
+        }
+
+        function upload(file, type) {
+            if (file !== null) {
+                let data = new FormData();
+                data.append('file', file);
+                data.append('name', file.name);
+                data.append('type', type);
+                $.ajax({
+                    url: '/api/kde/enemy/upload',
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false
+                })
+                    .done(function (response) {
+                        if (0 === response.length) {
+                            console.log("fail");
+                        } else {
+                            console.log("success");
+                            let relativeImageUrl = response.data;
+                            if (type === "fieldImageUrl") {
+                                fieldImage.attr('src', relativeImageUrl);
+                                fieldImage.val(relativeImageUrl);
+                            } else {
+                                cardImage.attr('src', relativeImageUrl);
+                                cardImage.val(relativeImageUrl);
+                            }
+                        }
+                    })
+                    .fail(function (response) {
+                        console.log("fail");
+                    })
+                    .always(function () {
+                    });
+            }
+        }
+    });
+</script>

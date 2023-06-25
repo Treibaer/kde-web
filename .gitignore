@@ -1,0 +1,7 @@
+.idea/
+logs/*.log
+vendor/
+www/images/kde/*.png
+www/images/kde/cards/*.png
+!www/images/kde/*Kartenhintergrund*.png
+.git2

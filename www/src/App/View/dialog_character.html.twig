@@ -1,0 +1,138 @@
+<style>
+    .smallIcon {
+        width: 24px;
+    }
+</style>
+<div id="modalCharacterEntry" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="headline">Neuer Charakter</h5>
+                <button type="button" id="dialogCloseButton" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class=" modalCharacterEntryTable {% if darkMode %}table-dark{% endif %}" style="width: 100%">
+                    <tr>
+                        <td>
+                            Karte
+                            <img id="fullCardUrl" width="100px;" src="/images/kde-icon.png">
+                            <div id="file-upload">
+                                <div id="drop_area">
+                                    <input type="file" id="files" name="files[]" accept="" style="display:none;"/>
+
+                                    <button style="width:100%" type="button" class="btn btn-success"
+                                            onclick="document.getElementById('files').click();">Bild auswählen
+                                    </button>
+                                </div>
+                            </div>
+                            Feld
+                            <img id="fieldImageUrl" width="100px;" src="/images/kde-icon.png">
+                            <div id="file-upload">
+                                <div id="drop_area">
+                                    <input type="file" id="files2" name="files[]" accept="" style="display:none;"/>
+
+                                    <button style="width:100%" type="button" class="btn btn-success"
+                                            onclick="document.getElementById('files2').click();">Bild auswählen
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+                        </td>
+                        <td colspan="5">
+                            <table>
+                                <tr>
+                                    <td>Name</td>
+                                    <td><input id="name" type="text"></td>
+                                </tr>
+                                <tr>
+                                    <td>Typ</td>
+                                    <td><input id="type" type="text"></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Geschlecht</td>
+                                    <td>
+                                        <select id="gender">
+                                            <option value="0">♂</option>
+                                            <option value="1">♀</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr style="">
+                        {{ select("Leben", "life", 1, 9) | raw }}
+                        {{ select("Mana", "mana", 1, 9) | raw }}
+                        {{ select("Ausdauer", "stamina", 1, 9) | raw }}
+                    </tr>
+                    <tr style="display:none">
+                        {{ select("Angriff", "attack", 1, 9) | raw }}
+                        {{ select("Abwehr", "defense", 1, 9) | raw }}
+                        {{ select("Mag. Angriff", "magicalAttack", 1, 9) | raw }}
+                    </tr>
+                    <tr style="display:none">
+                        {{ select("Mag. Abwehr", "magicalDefense", 1, 9) | raw }}
+                        {{ select("Geschick", "skill", 1, 9) | raw }}
+                        {{ select("Weisheit", "wisdom", 1, 9) | raw }}
+                    </tr>
+                    <tr style="display:none">
+                        <td>Spezialfähigkeit:</td>
+                    </tr>
+                    <tr style="display:none">
+                        <td colspan="6">
+                            <textarea id="specialSkillText" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Basis Skill:</td>
+                        <td colspan="5">
+                            <textarea id="baseSkill0" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Basis Skill:</td>
+                        <td colspan="5">
+                            <textarea id="baseSkill1" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                        </td>
+                        <td colspan="5">
+                            <textarea id="advancedSkillOne" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                        </td>
+                        <td colspan="5">
+                            <textarea id="advancedSkillTwo" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                            <img class="smallIcon" src="/images/kde/common/icons/crystal.png">
+                        </td>
+                        <td colspan="5">
+                            <textarea id="advancedSkillThree" style="width: 100%"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="dialogCancelButton" class="btn btn-secondary" data-dismiss="modal">Abbrechen</button>
+                <button type="button" id="buttonSaveCharacter" class="btn btn-success">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>

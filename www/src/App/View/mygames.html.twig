@@ -1,0 +1,45 @@
+{% include '/Default/header.html.twig' %}
+<div class="container p-4 " id="mainView">
+    <div class="border rounded p-1">
+        <table class="table table-sm table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Leiter</th>
+                <th>Brett</th>
+                <th>Spieler</th>
+                <th>Aktionen</th>
+            </tr>
+            {% for game in games %}
+                <tr class="">
+                    <td>{{ game.gameId }}</td>
+                    <td>
+                        {% for user in users %}
+                            {% if user.user == game.leader %}
+                                <div>{{ user.user }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for board in boards %}
+                            {% if board.boardId == game.boardId %}
+                                <div>{{ board.title }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for player in game.players %}
+                            {{ player.name }}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ gameUrl }}{{ game.gameId }}" target="_blank">
+                            <button class="btn btn-success">
+                                <span class="fas fa-gamepad" aria-hidden="true"></span>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

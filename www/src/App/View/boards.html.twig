@@ -1,0 +1,204 @@
+<!--<script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>-->
+{% include '/Default/header.html.twig' %}
+<style>
+    #colorPicker {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        margin: 0 !important;
+    }
+</style>
+{% if page == 'overview' %}
+    <div id="mainView" class="container p-4">
+        <table class="table table-sm table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Titel</th>
+                <th>Zeilen (1. Spalte)</th>
+                <th>Spalten</th>
+            </tr>
+            {% for board in boards %}
+                <tr class="">
+                    <td><a class="link-success" href="?boardId={{ board.boardId }}">{{ board.boardId }}</a></td>
+                    <td><a class="link-success" href="?boardId={{ board.boardId }}">{{ board.title }}</a></td>
+                    <td>{{ board.rows }}</td>
+                    <td>{{ board.columns }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <br><br>
+
+        <div class="border rounded p-1">
+            <table class="table table-sm table-dark" style="margin-bottom: 0">
+                <tr>
+                    <th>Titel</th>
+                    <th>Zeilen (1. Spalte)</th>
+                    <th>Spalten</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" id="inputTitle" class="form-control" value="">
+                    </td>
+                    <td>
+                        <input type="text" id="inputRows" class="form-control" value="{{ defaultRows }}">
+                    </td>
+                    <td>
+                        <input type="text" id="inputColumns" class="form-control" value="{{ defaultColumns }}">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button class="btn btn-success" id="buttonCreateBoard">Board erstellen</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% elseif boardId > 0 %}
+    <div class="container p-4">
+
+        <div style="display: inline-flex">
+            <button class="btn btn-success" id="saveButton">Speichern</button>
+            <!--<button class="btn btn-primary" id="screen">Screen</button>-->
+            <input class="form-control" id="inputTitle" value="{{ boardTitle }}">
+        </div>
+        <br>
+        <div id="upperBoard" style="margin-top: 35px" class="boards">
+            <div id="board" class="small">
+                {% set rows = board.rows %} <!--18-->
+                {% set cols = board.columns %} <!--29-->
+                {% for row in 0..rows - 1 %}
+                    {% set odd = row % 2 == 0 %}
+                    <div class="fieldRow" id="row_{{ row }}" style="">
+                        {% set realColus = odd ? cols : cols - 1 %}
+                        {% for column in 0.. cols - 1 %}
+                            {% set odd = column % 2 == 0 %}
+                            <div class="field {% if not odd %}even{% endif %} {% if row == rows - 1 %}lastRow{% endif %}">
+                                <div id="{{ row }}_{{ column }}" class="hiddenField" style=""></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="colorPicker" class="field default">
+            <div class="hiddenField" style=""></div>
+        </div>
+        <div id="colorPickerSelect">
+
+        </div>
+    </div>
+{% endif %}
+
+<script>
+
+    $(document).ready(function () {
+        let enableScreenshot = false;
+        let colorPicker = $('#colorPicker');
+        let colorPickerSelect = $('#colorPickerSelect');
+        let saveButton = $('#saveButton');
+        let boardId = {{ boardId }};
+        let board = $('#board');
+        let buttonCreateBoard = $('#buttonCreateBoard');
+        board.draggable();
+
+        loadBoard(boardId);
+
+        let currentColor = "empty";
+
+        colorPicker.on('click', function () {
+            let currentIndex = colors.indexOf(currentColor);
+            let newIndex = (currentIndex + 1) % colors.length;
+            currentColor = colors[newIndex];
+
+            setColor(colorPicker.find(".hiddenField"), currentColor);
+        });
+
+
+        for (let c in colors) {
+            let color = colors[c];
+            let div = "<div idd='" + c + "' class='field default " + color + "'><div class=\"hiddenField\" style=\"\"></div></div>";
+            colorPickerSelect.append(div);
+        }
+
+
+        $('.field').on('click', function () {
+            let parentId = $(this).parent().attr("id");
+            if (parentId === "colorPickerSelect") {
+                let key = $(this).attr("idd");
+
+                currentColor = colors[key];
+
+                setColor(colorPicker.find(".hiddenField"), currentColor);
+                return;
+            }
+            setColor($(this).find(".hiddenField"), currentColor);
+        });
+        saveButton.on('click', function () {
+            save(boardId)
+        });
+
+        buttonCreateBoard.on('click', function () {
+            createBoard()
+        });
+
+        if (enableScreenshot) {
+            board.removeClass("small");
+            board.addClass("screen");
+            board.draggable('disable');
+
+            board.css("width", "4480px");
+            board.css("padding-top", "50px");
+            board.css("padding-left", "60px");
+            colorPicker.hide();
+
+            $('#screen').on('click', function () {
+                html2canvas(document.querySelector("#board")).then(canvas => {
+                    document.body.appendChild(canvas)
+                });
+            });
+
+        }
+
+        function save(boardId) {
+            let title = $('#inputTitle').val();
+            /*html2canvas(document.querySelector("#board")).then(canvas => {
+                document.body.appendChild(canvas)
+            });*/
+            saveButton.attr("disabled", true);
+
+
+            $.post("/api/general?kde&board&save&boardId=" + boardId + "&version={{ version }}", {
+                "content": values,
+                title: title
+            }, function (data) {
+                saveButton.attr("disabled", false);
+                if (data.kde) {
+                    addToast("Success", true, data.message)
+                }
+            }).fail(function (response) {
+                addToast("Error", false, "server error")
+            })
+
+        }
+
+        function createBoard() {
+            buttonCreateBoard.attr("disabled", "true");
+            let title = $('#inputTitle').val();
+            if (title === "") {
+                title = "Leer";
+            }
+            let parameters = {
+                "title": title,
+                "rows": $('#inputRows').val(),
+                "columns": $('#inputColumns').val()
+            }
+            $.post("/api/general?kde&createBoard", parameters, function (data) {
+                location.reload();
+            });
+        }
+    });
+</script>

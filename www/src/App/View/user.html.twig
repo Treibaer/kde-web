@@ -1,0 +1,167 @@
+<div class="container">
+    <table class="table table-dark table-condensed">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Login name</th>
+            <th>Name</th>
+            <th>Email</th>
+            {% if isAdmin %}
+                <th>Admin</th>
+                <th>Edit</th>
+            {% endif %}
+        </tr>
+        </thead>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.userId }}</td>
+                <td>{{ user.userName }}</td>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.email }}</td>
+                {% if isAdmin %}
+                    <td>{{ user.isAdmin }}</td>
+                    <td><button userId="{{ user.userId }}" class="btn btn-success editUserButton">Edit</button></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    <button id="createNewUserButton" class="btn btn-outline-success">Create new</button>
+</div>
+{% include '/components/user_dialog.html.twig' %}
+{% include '/components/user_edit_dialog.html.twig' %}
+
+<script>
+    $(document).ready(function () {
+        let createNewUserButton = $('#createNewUserButton');
+        let editUserButton = $('.editUserButton');
+        let editCreateButton = $('#editCreateButton');
+        let dialogCreateButton = $('#dialogCreateButton');
+        let inputUserName = $('#inputUserName');
+        let inputUserPassword = $('#inputUserPassword');
+        let closeButton = $('.closeButton');
+        let editCloseButton = $('.editCloseButton');
+        let dialog = $('#exampleModal')
+        let editDialog = $('#userEditDialog')
+
+        let userEditDialogUserName = $('#userEditDialogUserName');
+        let userEditDialogPassword = $('#userEditDialogPassword');
+        let userEditDialogFullName = $('#userEditDialogFullName');
+        let userEditDialogEmail = $('#userEditDialogEmail');
+        let userEditDialogAdmin = $('#userEditDialogAdmin');
+        let userEditDialogCards = $('#userEditDialogCards');
+        let userEditDialogGames = $('#userEditDialogGames');
+        let userEditDialogBoards = $('#userEditDialogBoards');
+        let userEditDialogUsers = $('#userEditDialogUsers');
+
+        let users = {{ users|json_encode|raw }};
+
+        let openedUser = undefined;
+
+        function openEditDialog(user) {
+            $('#userEditDialogTitle').text("Benutzer: " + user.userName)
+            openedUser = user;
+            userEditDialogUserName.val(user.userName);
+            userEditDialogFullName.val(user.fullName);
+            userEditDialogPassword.val('');
+            userEditDialogEmail.val(user.email);
+            userEditDialogAdmin.prop("checked", user.isAdmin === "1");
+            userEditDialogCards.prop("checked", user.canEditCards === "1");
+            userEditDialogGames.prop("checked", user.canEditGames === "1");
+            userEditDialogBoards.prop("checked", user.canEditBoards === "1");
+            userEditDialogUsers.prop("checked", user.canSeeUsers === "1");
+
+            handleSwitches(user.isAdmin !== "0")
+
+            userEditDialogAdmin.unbind("change");
+            userEditDialogAdmin.change(function () {
+                if ($(this).prop('checked')) {
+                    handleSwitches(true)
+                } else {
+                    handleSwitches(false)
+                }
+            });
+            editDialog.show();
+        }
+
+        function handleSwitches(enabled) {
+            userEditDialogCards.prop("disabled", enabled);
+            userEditDialogGames.prop("disabled", enabled);
+            userEditDialogBoards.prop("disabled", enabled);
+            userEditDialogUsers.prop("disabled", enabled);
+        }
+
+        $('body').on('keyup', function (e) {
+            if (e.which === 27) {
+                dialog.hide();
+                editDialog.hide();
+            }
+        });
+
+        // edit start
+        // edit end
+
+        createNewUserButton.on('click', function () {
+            dialog.show();
+        });
+        closeButton.on('click', function () {
+            dialog.hide();
+        });
+        editCloseButton.on('click', function () {
+            editDialog.hide();
+        });
+
+        editUserButton.on('click', function () {
+            let userId = $(this).attr("userId");
+            openEditDialog(users[userId]);
+        });
+
+        dialogCreateButton.on('click', function () {
+            let parameters = {
+                "user": inputUserName.val(),
+                "pass": inputUserPassword.val(),
+                "fullName": "",
+                "email": ""
+            };
+            $.post("/api/user/create", parameters, function (data) {
+                if (data.success) {
+                    addToast("Success", true, data.message);
+                    dialog.hide();
+                    inputUserName.val('');
+                    inputUserPassword.val('');
+                    location.reload()
+                } else {
+                    addToast("Error", false, data.message);
+                }
+            }).fail(function (response) {
+                addToast("Error", false, "server error")
+            })
+        });
+
+
+        editCreateButton.on('click', function () {
+            let parameters = {
+                "userId": openedUser.userId,
+                "userName": userEditDialogUserName.val(),
+                "password": userEditDialogPassword.val(),
+                "fullName": userEditDialogFullName.val(),
+                "email": userEditDialogEmail.val(),
+                "isAdmin": userEditDialogAdmin.prop('checked'),
+                "canEditCards": userEditDialogCards.prop('checked'),
+                "canEditGames": userEditDialogGames.prop('checked'),
+                "canEditBoards": userEditDialogBoards.prop('checked'),
+                "canEditUsers": userEditDialogUsers.prop('checked')
+            };
+            $.post("/api/user/edit", parameters, function (data) {
+                if (data.success) {
+                    addToast("Success", true, data.message);
+                    editDialog.hide();
+                    location.reload()
+                } else {
+                    addToast("Error", false, data.message);
+                }
+            }).fail(function (response) {
+                addToast("Error", false, "server error")
+            })
+        });
+    });
+</script>

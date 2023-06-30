@@ -10,15 +10,12 @@ use KDE\Controller\DefaultController;
  */
 class GeneralController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $kde = $this->appManager->worker()->kde();
         $kdeApi = $this->appManager->worker()->kdeApi();
 
         if (isset($_GET["kde"])) {
-            if (isset($_GET['pdf'])) {
-                $kdeApi->createPDF();
-            }
             if (isset($_GET['createGame'])) {
                 $kdeApi->createGame();
             }
@@ -50,11 +47,11 @@ class GeneralController extends DefaultController
             }
 
             if (isset($_GET["moveCard"])) {
-                $cardId = isset($_POST["cardId"]) ? $_POST["cardId"] : 0;
-                $randomId = isset($_POST["randomId"]) ? $_POST["randomId"] : 0;
-                $selectedPlayerId = isset($_POST["selectedPlayerId"]) ? $_POST["selectedPlayerId"] : "";
+                $cardId = $_POST["cardId"] ?? 0;
+                $randomId = $_POST["randomId"] ?? 0;
+                $selectedPlayerId = $_POST["selectedPlayerId"] ?? "";
 
-                $from = isset($_POST['from']) ? $_POST['from'] : null;
+                $from = $_POST['from'] ?? null;
                 $kdeApi->moveCard($cardId, $randomId, $from, $selectedPlayerId);
             }
 
@@ -132,24 +129,15 @@ class GeneralController extends DefaultController
 
             // get field information: at first: the players hand
             if (isset($_GET["field"])) {
-                $kdeApi->loadField(isset($_GET['hash']) ? $_GET['hash'] : "");
+                $kdeApi->loadField($_GET['hash'] ?? "");
             }
             $this->kdeFailJson();
         }
     }
 
-
-    private function kdeJson($jsonArray = [])
+    private function kdeFailJson()
     {
-        global $kde;
-        $jsonArray["kde"] = true;
-        $jsonArray["alive"] = true;
-        $jsonArray["version"] = $kde->getVersion();
-        $this->json($jsonArray);
-    }
-
-    private function kdeFailJson($jsonArray = [])
-    {
+        $jsonArray = [];
         global $kde;
         $jsonArray["kde"] = false;
         $jsonArray["alive"] = false;

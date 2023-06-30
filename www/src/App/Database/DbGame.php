@@ -10,13 +10,13 @@ use KDE\Model\Game;
  */
 class DbGame extends Database
 {
-    static $databaseName = 'KdeGame';
+    static string $databaseName = 'KdeGame';
     static $model = Game::class;
 
     /**
      * @return Game[]
      */
-    public function all()
+    public function all(): array
     {
         $output = [];
         /** @var Game[] $cards */
@@ -31,7 +31,7 @@ class DbGame extends Database
     /**
      * @return Game[]
      */
-    public function myGames()
+    public function myGames(): array
     {
         $output = [];
         /** @var Game[] $games */
@@ -56,9 +56,10 @@ class DbGame extends Database
     }
 
     /**
-     * @return Game || null
+     * @param $gameId
+     * @return Game|null
      */
-    public function getById($gameId)
+    public function getById($gameId): ?Game
     {
         /** @var Game[] $cards */
         $cards = $this->get('*');
@@ -74,13 +75,13 @@ class DbGame extends Database
     /**
      * @return Game || null
      */
-    public function getByUserId($userId)
+    public function getByUserId($userId): ?Game
     {
         /** @var Game[] $cards */
         $cards = $this->get('*');
 
         for ($i = 0; $i < count($cards); $i++) {
-            if (strpos($cards[$i]->getPlayers(), $userId) !== false) {
+            if (str_contains($cards[$i]->getPlayers(), $userId)) {
                 return $cards[$i];
             }
         }

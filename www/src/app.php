@@ -32,13 +32,13 @@ $nameSpacePrefix = 'KDE';
 $pathPrefix = 'App';
 
 // TODO: prefix handling
-if (strpos($requestURI, '/api') === 0) {
+if (str_starts_with($requestURI, '/api')) {
     $requestURI = '/' . substr($requestURI, 4);
     $nameSpacePrefix = 'KDEApi';
     $pathPrefix = 'Api';
 }
 
-$isAdmin = strpos($requestURI, '/admin') === 0;
+$isAdmin = str_starts_with($requestURI, '/admin');
 
 
 $controller = null;
@@ -46,14 +46,14 @@ $page = '/';
 
 
 $requestURI = explode('?', strtolower($requestURI))[0];
-if ('/' === substr($requestURI, -1)) {
+if (str_ends_with($requestURI, '/')) {
     $requestURI = substr($requestURI, 0, -1);
 }
 $requestURI = join('/', array_map("ucfirst", explode('/', $requestURI)));
 
 $pages = ["Category", "Profile", "Session", "User"];
 foreach ($pages as $page) {
-    if (strpos($requestURI, '/' . $page . '/') === 0) {
+    if (str_starts_with($requestURI, '/' . $page . '/')) {
         // show category controller
         $requestURI = "/" . $page;
         break;
@@ -73,7 +73,7 @@ if (null === $page) {
  * @param string $pathPrefix
  * @return array
  */
-function determinePageController($requestURI, $nameSpacePrefix = 'TBCore', $pathPrefix = 'Core')
+function determinePageController($requestURI, $nameSpacePrefix = 'TBCore', $pathPrefix = 'Core'): array
 {
     $page = null;
     $controller = null;
@@ -95,29 +95,17 @@ function determinePageController($requestURI, $nameSpacePrefix = 'TBCore', $path
     return [$page, $controller];
 }
 
-if (strpos($requestURI, '/Kde/Images/Dynamic') !== false) {
-    $view = new stdClass();
-    $controller = \TB\Controller\Kde\ImageController::class;
-    $controller = new $controller($view, $_REQUEST, $apiManager);
-    $controller->decode();
-    $controller->prepare();
-    $controller->start();
-    $apiManager->database()->dbDummy()->close();
-    die;
-}
 
 $publicApis = ['//kde/character/get'];
-if ($nameSpacePrefix == "TBApi" && in_array($page, $publicApis)) {
-
-} else {
+if ($nameSpacePrefix != "TBApi" || !in_array($page, $publicApis)) {
 // handle login
-    if (null === $user && strpos(strtolower($page), '/login') === false) {
+    if (null === $user && !str_contains(strtolower($page), '/login')) {
         if (isset($_REQUEST['sessionId'])) {
             echo json_encode(['success' => false, 'logout' => true]);
             die;
         }
-        $ru = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-        header('Location: /login?ref=' .$ru);
+        $ru = $_SERVER['REQUEST_URI'] ?? "";
+        header('Location: /login?ref=' . $ru);
     }
 }
 
@@ -138,7 +126,7 @@ $view = new stdClass();
 // global vars
 $view->currentYear = date('Y');
 /** @var TBCore\Controller\IndexController $controller */
-$isCoreController = (strpos($controller, 'TBCore\Controller') !== false);
+$isCoreController = str_contains($controller, 'TBCore\Controller');
 $controller = new $controller($view, $_REQUEST, $isCoreController ? $apiManager->core() : $apiManager);
 $controller->decode();
 $controller->prepare();
@@ -176,7 +164,7 @@ if ('Api' !== $pathPrefix) {
 
 $apiManager->database()->dbDummy()->close();
 
-function createTwig($pathPrefix)
+function createTwig($pathPrefix): Twig_Environment
 {
     // try catch, so the config.php could be included outside this folder, i.e. e.g. from api/*.php
     $loader = new Twig_Loader_Filesystem(__DIR__ . '/' . $pathPrefix . '/View');

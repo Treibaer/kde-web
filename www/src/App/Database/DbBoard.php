@@ -10,13 +10,13 @@ use KDE\Model\Board;
  */
 class DbBoard extends Database
 {
-    static $databaseName = 'KdeBoard';
+    static string $databaseName = 'KdeBoard';
     static $model = Board::class;
 
     /**
      * @return Board[]
      */
-    public function all()
+    public function all(): array
     {
         $output = [];
         /** @var Board[] $cards */
@@ -31,7 +31,7 @@ class DbBoard extends Database
     /**
      * @return Board[]
      */
-    public function allSorted()
+    public function allSorted(): array
     {
         $boards = $this->all();
         usort($boards, function ($a, $b) {
@@ -45,7 +45,7 @@ class DbBoard extends Database
     /**
      * @return Board[]
      */
-    public function allJSON()
+    public function allJSON(): array
     {
         $output = [];
         /** @var Board[] $cards */
@@ -58,9 +58,10 @@ class DbBoard extends Database
     }
 
     /**
-     * @return Board || null
+     * @param $boardId
+     * @return Board | null
      */
-    public function getById($boardId)
+    public function getById($boardId): ?Board
     {
         /** @var Board[] $cards */
         $cards = $this->get('*');

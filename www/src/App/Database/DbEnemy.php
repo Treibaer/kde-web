@@ -16,7 +16,7 @@ class DbEnemy extends Database
     /**
      * @return Enemy[]
      */
-    public function all()
+    public function all(): array
     {
         $characters = [];
         /** @var Enemy[] $chars */
@@ -29,9 +29,9 @@ class DbEnemy extends Database
     }
 
     /**
-     * @return []
+     * @return array
      */
-    public function allJSON()
+    public function allJSON(): array
     {
         $characters = $this->all();
         foreach ($characters as &$value) {
@@ -41,9 +41,10 @@ class DbEnemy extends Database
     }
 
     /**
-     * @return []
+     * @param $type
+     * @return Enemy[]
      */
-    public function allByTypeJSON($type)
+    public function allByTypeJSON($type): array
     {
         $characters = $this->allByType($type);
         foreach ($characters as &$value) {
@@ -56,7 +57,7 @@ class DbEnemy extends Database
      * @param string $type
      * @return Enemy[]
      */
-    public function allByType($type)
+    public function allByType(string $type): array
     {
         $characters = [];
         /** @var Enemy[] $chars */

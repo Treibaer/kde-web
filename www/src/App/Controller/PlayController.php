@@ -10,12 +10,9 @@ use KDE\Worker\Kde;
  */
 class PlayController extends DefaultController
 {
-    /**
-     * @var Kde
-     */
-    private $kde = null;
+    private ?Kde $kde = null;
 
-    public function start()
+    public function start(): void
     {
         // character overview
         if (isset($_GET["characters"])) {
@@ -28,10 +25,9 @@ class PlayController extends DefaultController
         $userId = null;
         $darkMode = true;
 
-        // playcontroller is public, so we have to check if we are logged in
+        // play controller is public, so we have to check if we are logged in
         if ($this->getUser() !== null) {
             $userId = $this->getUser()->getUserId();
-            $darkMode = true;
         }
         $gameId = isset($_GET["gameId"]) ? $_GET["gameId"] : 0;
 
@@ -65,7 +61,7 @@ class PlayController extends DefaultController
             }
         }
 
-        if ($game == null || !$takesPart) {
+        if (!$takesPart) {
             header("HTTP/1.0 404 Not Found");
             echo "404";
             die;
@@ -74,7 +70,7 @@ class PlayController extends DefaultController
         // fetch boardId, etc.
         $boardId = $game->getBoardId();
         $this->view->tabControl = $this->worker->tabControl("play");
-        $this->view->darkMode = $darkMode;
+        $this->view->darkMode = true;
         $this->kde = $this->worker->kde();
         $this->view->boardId = $boardId;
         $this->view->board = $this->dbManager->dbBoard()->getById($boardId);
@@ -84,7 +80,6 @@ class PlayController extends DefaultController
 
         $isLeader = $userId == $game->getLeader();
         $this->view->isLeader = $isLeader;
-//        $this->view->loggedIn = $this->getUser() !== null;
         $this->view->myPlayerId = $userId;
         $this->view->states = $this->kde->getStates();
         $this->view->page = "play";
@@ -143,7 +138,6 @@ class PlayController extends DefaultController
         });
 
         $this->view->takesPart = $takesPartAsAPlayer;
-
     }
 
     public function twigFunctions(\Twig_Environment &$twig)

@@ -8,10 +8,7 @@ use KDE\Worker\Manager as WorkerManager;
 
 class Manager
 {
-    /**
-     * @var array
-     */
-    private $setter;
+    private array $setter;
 
     public function __construct()
     {
@@ -21,7 +18,7 @@ class Manager
     /**
      * @return CoreManager
      */
-    public function core()
+    public function core(): CoreManager
     {
         if (!isset($this->setter[__FUNCTION__])) {
             $this->setter[__FUNCTION__] = new CoreManager();
@@ -32,7 +29,7 @@ class Manager
     /**
      * @return WorkerManager
      */
-    public function worker()
+    public function worker(): WorkerManager
     {
         if (!isset($this->setter[__FUNCTION__])) {
             $this->setter[__FUNCTION__] = new WorkerManager($this);
@@ -43,16 +40,8 @@ class Manager
     /**
      * @return DatabaseManager
      */
-    public function database()
+    public function database(): DatabaseManager
     {
         return $this->dbManager;
-    }
-
-    private function get($class) {
-
-        if (!isset($this->setter[__FUNCTION__])) {
-            $this->setter[__FUNCTION__] = new $class($this);
-        }
-        return $this->setter[__FUNCTION__];
     }
 }

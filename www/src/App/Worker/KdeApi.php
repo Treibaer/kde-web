@@ -15,10 +15,6 @@ class KdeApi
      * @var DbManager
      */
     private $dbManager;
-    /**
-     * @var DatabaseManager
-     */
-    private $coreDbManager;
 
     /**
      * @var Kde
@@ -57,60 +53,23 @@ class KdeApi
      * @param Manager $workerManager
      * @param DatabaseManager $coreDbManager
      */
-    public function __construct($dbManager, $workerManager, $coreDbManager)
+    public function __construct(DbManager $dbManager, Manager $workerManager, DatabaseManager $coreDbManager)
     {
         $this->dbManager = $dbManager;
         $this->kde = $workerManager->kde();
-        $this->coreDbManager = $coreDbManager;
     }
 
     /**
      * @param $user User
      */
-    public function login($user)
+    public function login(?User $user): void
     {
         $this->user = $user;
-        $this->userId = $user === null ? null : $user->getUserId();
+        $this->userId = $user?->getUserId();
         $this->game = $this->loadGame();
         $this->gameId = $this->game->getGameId();
         $this->isLeader = $this->game->getLeader() == $this->userId;
 
-    }
-
-    public function createPDF()
-    {
-        error_reporting(-1);
-        $paths = ['/data1/canvas.png'];
-        /*$children = $this->dbManager->dbDocument()->getChildrenByParentId($doc->getDocumentId());
-        foreach ($children as $child) {
-            $paths[] = $folder . $child->getFileName();
-        }
-
-        */
-        ini_set('error_reporting', E_ALL);
-
-
-        header("Content-type:application/pdf");
-
-// It will be called downloaded.pdf
-//header("Content-Disposition:attachment;filename=downloaded.pdf");
-
-        $pdf = new \Imagick($paths);
-
-
-#$pdf->setResolution(576,576); # 17,69 x 12,82 cm
-#$pdf->setResolution(256,256); # 39,8 x 28,84 cm
-#$pdf->setResolution(128,128); # 79,6 x 57,67 cm
-        $pdf->setResolution(120, 120); #101,88 x 73,82 cm
-        $pdf->setCompressionQuality(100);
-
-
-        $pdf->setImageFormat('pdf');
-        $file = '/tmp/pdf.pdf';
-        $contentType = 'application/pdf';
-        $pdf->writeImages($file, true);
-        readfile($file);
-        die;
     }
 
     public function createGame()
@@ -186,7 +145,7 @@ class KdeApi
         $this->kdeJson();
     }
 
-    public function getBoard($boardId)
+    public function getBoard($boardId): void
     {
         $board = $this->dbManager->dbBoard()->getById($boardId);
         if ($board == null) {
@@ -205,7 +164,7 @@ class KdeApi
         }
     }
 
-    public function saveGame($gameId, $boardId, $leader)
+    public function saveGame($gameId, $boardId, $leader): void
     {
         $game = $this->dbManager->dbGame()->getById($gameId);
         if ($game == null) {

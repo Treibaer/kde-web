@@ -8,7 +8,7 @@ namespace KDE\Controller;
  */
 class IndexController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $this->view->title = "Kristalle der Ewigkeit";
         $this->view->darkMode = true;

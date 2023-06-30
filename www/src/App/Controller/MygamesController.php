@@ -8,7 +8,7 @@ namespace KDE\Controller;
  */
 class MygamesController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $this->view->tabControl = $this->worker->tabControl("mygames");
         $this->view->darkMode = true;

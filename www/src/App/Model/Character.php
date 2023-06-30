@@ -15,117 +15,29 @@ class Character extends Model
      * @TBCore\Annotation\PrimaryKey
      * @var integer
      */
-    protected $characterId = -1;
-
-    /**
-     * @var integer
-     */
-    protected $gender = 0;
-
-    /**
-     * @var string
-     */
-    protected $name = "";
-
-    /**
-     * @var string
-     */
-    protected $type = "";
-
-    /**
-     * @var integer
-     */
-    protected $life = 1;
-
-    /**
-     * @var integer
-     */
-    protected $mana = 1;
-
-    /**
-     * @var integer
-     */
-    protected $stamina = 1;
-
-    /**
-     * @var integer
-     */
-    protected $attack = 1;
-
-    /**
-     * @var integer
-     */
-    protected $defense = 1;
-
-    /**
-     * @var integer
-     */
-    protected $magicalAttack = 1;
-
-    /**
-     * @var integer
-     */
-    protected $magicalDefense = 1;
-
-    /**
-     * @var integer
-     */
-    protected $skill = 1;
-
-    /**
-     * @var integer
-     */
-    protected $wisdom = 1;
-
-    /**
-     * @var string
-     */
-    protected $specialSkillText = "";
-
-    /**
-     * @var string
-     */
-    protected $imageUrl = "";
-
-    /**
-     * @var string
-     */
-    protected $fieldImageUrl = "";
-
-    /**
-     * @var string
-     */
-    protected $color = "";
-
-    /**
-     * @var string
-     */
-    protected $fullCardUrl = "";
-
-    /**
-     * @var string
-     */
-    protected $baseSkill0 = "";
-
-    /**
-     * @var string
-     */
-    protected $baseSkill1 = "";
-
-    /**
-     * @var string
-     */
-    protected $advancedSkillOne = "";
-
-    /**
-     * @var string
-     */
-    protected $advancedSkillTwo = "";
-
-    /**
-     * @var string
-     */
-    protected $advancedSkillThree = "";
+    protected int $characterId = -1;
+    protected int $gender = 0;
+    protected string $name = "";
+    protected string $type = "";
+    protected int $life = 1;
+    protected int $mana = 1;
+    protected int $stamina = 1;
+    protected int $attack = 1;
+    protected int $defense = 1;
+    protected int $magicalAttack = 1;
+    protected int $magicalDefense = 1;
+    protected int $skill = 1;
+    protected int $wisdom = 1;
+    protected string $specialSkillText = "";
+    protected string $imageUrl = "";
+    protected string $fieldImageUrl = "";
+    protected string $color = "";
+    protected string $fullCardUrl = "";
+    protected string $baseSkill0 = "";
+    protected string $baseSkill1 = "";
+    protected string $advancedSkillOne = "";
+    protected string $advancedSkillTwo = "";
+    protected string $advancedSkillThree = "";
 
     /**
      * @return int

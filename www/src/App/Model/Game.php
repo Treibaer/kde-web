@@ -15,100 +15,40 @@ class Game extends Model
      * @TBCore\Annotation\PrimaryKey
      * @var integer
      */
-    public $gameId = 0;
+    public int $gameId = 0;
+    public int $boardId = 0;
 
-    /**
-     * @var int
-     */
-    public $boardId = 0;
+    // valid json format
+    public string $players = "{}";
+    public int $leader = 0;
+    public int $creationDate = 0;
+    public int $state = 0;
 
-    /**
-     * valid json format
-     * @var string
-     */
-    public $players = "{}";
+    // valid json format
+    public string $playerPositions = "{}";
 
-    /**
-     * @var int
-     */
-    public $leader = 0;
+    // valid json format
+    public string $openCards = "[]";
 
-    /**
-     * @var int
-     */
-    public $creationDate = 0;
+    // valid json format
+    public string $libraryCards = "[]";
 
-    /**
-     * @var int
-     */
-    public $state = 0;
+    // valid json format
+    public string $trashCards = "[]";
 
-    /**
-     * valid json format
-     * @var string
-     */
-    public $playerPositions = "{}";
+    // valid json format
+    public string $ping = "{}";
+    public string $marketPlace = "";
+    public int $dice = 0;
+    public int $diceTime = 0;
+    public string $diceRoller = "";
+    protected string $lastUpdatedHash = "";
 
-    /**
-     * valid json format
-     * @var string
-     */
-    public $openCards = "[]";
+    // valid json format
+    protected string $custom = "{}";
 
-    /**
-     * valid json format
-     * @var string
-     */
-    public $libraryCards = "[]";
-
-    /**
-     * valid json format
-     * @var string
-     */
-    public $trashCards = "[]";
-
-    /**
-     * @var string
-     */
-    public $ping = "{}";
-
-    /**
-     * @var string
-     */
-    public $marketPlace = "";
-
-    /**
-     * @var int
-     */
-    public $dice = 0;
-
-    /**
-     * @var int
-     */
-    public $diceTime = 0;
-
-    /**
-     * @var string
-     */
-    public $diceRoller = "";
-
-    /**
-     * @var string
-     */
-    protected $lastUpdatedHash = "";
-
-    /**
-     * valid json format
-     * @var string
-     */
-    protected $custom = "{}";
-
-    /**
-     * valid json format
-     * @var string
-     */
-    public $bag = "[]";
-
+    // valid json format
+    public string $bag = "[]";
 
     /**
      * @return int

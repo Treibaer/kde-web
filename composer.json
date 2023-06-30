@@ -1,6 +1,6 @@
 {
   "require": {
-    "php": ">=7.0",
+    "php": ">=8.0",
     "twig/twig": "~2.0",
     "jms/serializer": "^1.8"
   },

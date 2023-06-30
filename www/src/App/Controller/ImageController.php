@@ -2,9 +2,11 @@
 
 namespace KDE\Controller;
 
+use JetBrains\PhpStorm\NoReturn;
+
 class ImageController extends DefaultController
 {
-    public function start()
+    #[NoReturn] public function start()
     {
         $requestURI = $_SERVER['REQUEST_URI'];
         $path = explode('/', $requestURI);

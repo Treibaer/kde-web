@@ -13,18 +13,10 @@ use KDE\Model\User;
  */
 class DbManager
 {
-    /**
-     * @var User
-     */
-    private $user;
-    /**
-     * @var CoreDbManager
-     */
-    private $coreDbManager;
+    private User $user;
 
-    public function __construct(CoreDbManager $coreDbManager)
+    public function __construct(private CoreDbManager $coreDbManager)
     {
-        $this->coreDbManager = $coreDbManager;
     }
 
     /**
@@ -32,7 +24,7 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbDummy()
+    public function dbDummy(): DbDummy
     {
         return new DbDummy($this->coreDbManager, $this);
     }
@@ -41,26 +33,9 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbCharacter() {
+    public function dbCharacter(): DbCharacter
+    {
         return new DbCharacter($this->coreDbManager, $this);
-    }
-
-    /**
-     * @return DbUser
-     * @throws Exception
-     * @throws MissingAnnotationException
-     */
-    public function dbKUser() {
-        return new DbUser($this->coreDbManager, $this);
-    }
-
-    /**
-     * @return DbAchievement
-     * @throws Exception
-     * @throws MissingAnnotationException
-     */
-    public function dbAchievement() {
-        return new DbAchievement($this->coreDbManager, $this);
     }
 
     /**
@@ -68,7 +43,8 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbCard() {
+    public function dbCard(): DbCard
+    {
         return new DbCard($this->coreDbManager, $this);
     }
 
@@ -77,7 +53,8 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbBoard() {
+    public function dbBoard(): DbBoard
+    {
         return new DbBoard($this->coreDbManager, $this);
     }
 
@@ -86,17 +63,9 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbGame() {
+    public function dbGame(): DbGame
+    {
         return new DbGame($this->coreDbManager, $this);
-    }
-
-    /**
-     * @return DbGameActivity
-     * @throws Exception
-     * @throws MissingAnnotationException
-     */
-    public function dbGameActivity() {
-        return new DbGameActivity($this->coreDbManager, $this);
     }
 
     /**
@@ -104,7 +73,8 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbEnemy() {
+    public function dbEnemy(): DbEnemy
+    {
         return new DbEnemy($this->coreDbManager, $this);
     }
 
@@ -113,7 +83,8 @@ class DbManager
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function dbUser() {
+    public function dbUser(): DbUser
+    {
         return new DbUser($this->coreDbManager, $this);
     }
 

@@ -15,42 +15,14 @@ class Enemy extends Model
      * @TBCore\Annotation\PrimaryKey
      * @var integer
      */
-    protected $kdeEnemyId = 0;
-
-    /**
-     * @var string
-     */
-    protected $name = "";
-
-    /**
-     * @var int
-     */
-    protected $life = 1;
-
-    /**
-     * @var string
-     */
-    protected $fieldImageUrl = "";
-
-    /**
-     * @var string
-     */
-    protected $fullCardUrl = "";
-
-    /**
-     * @var string
-     */
-    protected $type = "";
-
-    /**
-     * @var int
-     */
-    public $stamina = 1;
-
-    /**
-     * @var int
-     */
-    public $mana = 1;
+    protected int $kdeEnemyId = 0;
+    protected string $name = "";
+    protected int $life = 1;
+    protected string $fieldImageUrl = "";
+    protected string $fullCardUrl = "";
+    protected string $type = "";
+    public int $stamina = 1;
+    public int $mana = 1;
 
     public function __construct($o = null)
     {
@@ -200,5 +172,4 @@ class Enemy extends Model
         $this->mana = $mana;
         return $this;
     }
-
 }

@@ -5,19 +5,9 @@ namespace KDE\Worker;
 
 class Tab
 {
-    /**
-     * @var bool
-     */
-    private $active = false;
-    /**
-     * @var string
-     */
-    private $link = "";
-
-    /**
-     * @var string
-     */
-    private $title = "";
+    private bool $active = false;
+    private string $link = "";
+    private string $title = "";
 
     public function __construct($active, $link, $title)
     {

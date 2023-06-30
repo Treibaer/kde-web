@@ -13,9 +13,9 @@ class BoardsController extends DefaultController
     /**
      * @var Kde
      */
-    private $kde = null;
+    private ?Kde $kde = null;
 
-    public function start()
+    public function start(): void
     {
         $this->kde = $this->worker->kde();
         $this->view->tabControl = $this->worker->tabControl("boards");

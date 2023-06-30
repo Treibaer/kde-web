@@ -3,28 +3,23 @@
 namespace KDE\Worker;
 
 use KDE\Manager as AppManager;
+use KDE\Model\User;
 
 class Manager
 {
     /**
      * @var array
      */
-    private $setter;
+    private array $setter;
 
-    /**
-     * @var AppManager
-     */
-    private $appManager;
-
-    public function __construct(AppManager $appManager)
+    public function __construct(private AppManager $appManager)
     {
-        $this->appManager = $appManager;
     }
 
     /**
      * @return Kde
      */
-    public function kde()
+    public function kde(): Kde
     {
         if (!isset($this->setter[__FUNCTION__])) {
             $this->setter[__FUNCTION__] = new Kde($this->appManager->dbManager);
@@ -35,7 +30,7 @@ class Manager
     /**
      * @return KdeApi
      */
-    public function kdeApi()
+    public function kdeApi(): KdeApi
     {
         if (!isset($this->setter[__FUNCTION__])) {
             $this->setter[__FUNCTION__] = new KdeApi($this->appManager->dbManager, $this, $this->appManager->core()->database());
@@ -69,11 +64,10 @@ class Manager
         if ($user->getCanSeeUsers()) {
             $tabs[] = new Tab("user" == $page, "/user", "Benutzer");
         }
-        $tabs[] = new Tab("changelog" == $page, "/changelog", "Changelog");
         return $tabs;
     }
 
-    public function login()
+    public function login(): ?User
     {
         $user = null;
         $sessionId = null;

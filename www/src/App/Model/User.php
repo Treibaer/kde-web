@@ -16,69 +16,69 @@ class User extends Model
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $userId = 0;
+    public int $userId = 0;
     /**
      * @TBCore\Annotation\Type("varchar")
      * @var string
      */
-    protected $sessionId = "";
-
-    /**
-     * @TBCore\Annotation\Type("varchar")
-     * @var string
-     */
-    public $userName = "";
+    protected string $sessionId = "";
 
     /**
      * @TBCore\Annotation\Type("varchar")
      * @var string
      */
-    public $fullName = "";
+    public string $userName = "";
 
     /**
      * @TBCore\Annotation\Type("varchar")
      * @var string
      */
-    protected $password = "";
+    public string $fullName = "";
 
     /**
      * @TBCore\Annotation\Type("varchar")
      * @var string
      */
-    public $email = "";
+    protected string $password = "";
+
+    /**
+     * @TBCore\Annotation\Type("varchar")
+     * @var string
+     */
+    public string $email = "";
 
     /**
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $isAdmin = 0;
+    public int $isAdmin = 0;
 
     /**
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $canEditGames = 0;
+    public int $canEditGames = 0;
 
     /**
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $canEditCards = 0;
+    public int $canEditCards = 0;
 
     /**
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $canSeeUsers = 0;
+    public int $canSeeUsers = 0;
 
     /**
      * @TBCore\Annotation\Type("int")
      * @var int
      */
-    public $canEditBoards = 0;
+    public int $canEditBoards = 0;
 
     /**
-     * @return int
+     * @return string
      */
     public function getUserId(): string
     {
@@ -274,6 +274,4 @@ class User extends Model
         $this->canEditBoards = $canEditBoards;
         return $this;
     }
-
-
 }

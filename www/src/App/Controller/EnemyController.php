@@ -10,10 +10,10 @@ use KDE\Model\Enemy;
  */
 class EnemyController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $this->view->darkMode = true;
-        $type = isset($_GET['type']) ? $_GET['type'] : 'enemy';
+        $type = $_GET['type'] ?? 'enemy';
         $this->view->tabControl = $this->worker->tabControl($type);
         $enemies = $this->dbManager->dbEnemy()->allByTypeJSON($type);
         usort($enemies, function ($a, $b) {
@@ -28,7 +28,7 @@ class EnemyController extends DefaultController
         $this->view->backgroundSmallCardUrl = $this->worker->kde()->backgroundSmallCardUrl();
     }
 
-    public function twigFunctions(\Twig_Environment &$twig)
+    public function twigFunctions(\Twig_Environment &$twig): void
     {
         $twig->addFunction(new \Twig_SimpleFunction('select', function ($title, $id, $minValue, $maxValue) {
             $return = "<td>$title</td><td><select id='$id'>";

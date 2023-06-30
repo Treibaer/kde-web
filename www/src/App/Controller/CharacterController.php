@@ -10,7 +10,7 @@ use KDE\Model\Character;
  */
 class CharacterController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $this->view->darkMode = true;
         $this->view->tabControl = $this->worker->tabControl('character');
@@ -21,7 +21,7 @@ class CharacterController extends DefaultController
         $this->view->backgroundCardUrl = $this->worker->kde()->backgroundCardUrl();
     }
 
-    public function twigFunctions(\Twig_Environment &$twig)
+    public function twigFunctions(\Twig_Environment &$twig): void
     {
         $twig->addFunction(new \Twig_SimpleFunction('select', function ($title, $id, $minValue, $maxValue) {
             $return = "<td>$title</td><td><select id='$id'>";

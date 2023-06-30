@@ -15,28 +15,16 @@ class Board extends Model
      * @TBCore\Annotation\PrimaryKey
      * @var integer
      */
-    protected $boardId = 0;
+    protected int $boardId = 0;
 
-    /**
-     * @var string
-     */
-    protected $title = "";
+    protected string $title = "";
 
-    /**
-     * valid json format
-     * @var string
-     */
-    protected $content = "{}";
+    // valid json format
+    protected string $content = "{}";
 
-    /**
-     * @var integer
-     */
-    protected $rows = 0;
+    protected int $rows = 0;
 
-    /**
-     * @var integer
-     */
-    protected $columns = 0;
+    protected int $columns = 0;
 
     /**
      * @return int
@@ -130,5 +118,4 @@ class Board extends Model
         $this->columns = $columns;
         return $this;
     }
-
 }

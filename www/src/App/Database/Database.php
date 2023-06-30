@@ -6,18 +6,12 @@ use TBCore\Database\DbManager as CoreDbManager;
 
 class Database extends \TBCore\Database\Database
 {
-    /**
-     * @var DbManager
-     */
-    protected $dbManager;
-
-    public function __construct(CoreDbManager $coreDbManager, DbManager $dbManager)
+    public function __construct(CoreDbManager $coreDbManager, protected DbManager $dbManager)
     {
         parent::__construct($coreDbManager);
-        $this->dbManager = $dbManager;
     }
 
-    function getFieldsOfDbTableRaw($tableName)
+    function getFieldsOfDbTableRaw($tableName): array
     {
         $q = mysqli_query($this->connection, 'DESCRIBE ' . $tableName);
         $fields = [];

@@ -22,54 +22,37 @@ class Kde
      * MKM constructor.
      * @param DbManager $dbManager
      */
-    public function __construct($dbManager)
+    public function __construct(DbManager $dbManager)
     {
         $this->dbManager = $dbManager;
     }
-    
-    public function subTabControl($page, $subPage)
-    {
-        return [
-            new Tab("library" == $subPage, "?type=library", "Bibliothek"),
-            //new Tab("weather" == $subPage, "?type=weather", "Wetter"),
-            new Tab("marketplace" == $subPage, "?type=marketplace", "Marktplatz"),
-        ];
-    }
-
-    public function allUsers()
-    {
-        return $this->dbManager->dbUser()->getUsersAsAssocArray();
-    }
-
-    public function allAvailableAchievements()
-    {
-        return $this->dbManager->dbAchievement()->all();
-    }
 
     /**
      * @return Enemy[]
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function getEnemiesAndPets()
+    public function getEnemiesAndPets(): array
     {
         return $this->dbManager->dbEnemy()->allJSON();
     }
+
     /**
      * @return Enemy[]
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function getEnemies()
+    public function getEnemies(): array
     {
         return $this->dbManager->dbEnemy()->allByTypeJSON("enemy");
     }
+
     /**
      * @return Enemy[]
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function getPets()
+    public function getPets(): array
     {
         return $this->dbManager->dbEnemy()->allByTypeJSON('pets');
     }
@@ -78,12 +61,12 @@ class Kde
      * @throws Exception
      * @throws MissingAnnotationException
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         return $this->dbManager->dbEnemy()->allByTypeJSON('event');
     }
 
-    public function getStates()
+    public function getStates(): array
     {
         return [
             "Bewegungsunfaehig" => ["Bewegungsunfähig", "Bewegungsunfaehig.png", "Es können in der nächsten Runde keine Aktionen zum Fortbewegen genutzt werden."],
@@ -135,58 +118,17 @@ class Kde
     /**
      * @return float
      */
-    public function getVersion()
+    public function getVersion(): float
     {
         return 33;
     }
 
-    /**
-     * @param string $file
-     * @param string $imageSize
-     * @param string $extension
-     */
-    public function getImageResized(string $file, string $imageSize, string $extension)
+    public function defaultRows(): int
     {
-        $size = getimagesize($file);
-        $width = $size[0];
-        $height = $size[1];
-        $thumbSize = 80;
-        if ('thumb' === $imageSize) {
-            $thumbSize = min($width, $height, 80);
-        } else if ('small' === $imageSize) {
-            $thumbSize = min($width, $height, 400);
-        } else if ('medium' === $imageSize) {
-            $thumbSize = min($width, $height) * 0.5;
-        } else {
-            $thumbSize = min($height, $imageSize);
-        }
-        if ($width > $height) {
-            $newWidth = $thumbSize;
-            $newHeight = $height / ($width / $thumbSize);
-        } else {
-            $newWidth = $width / ($height / $thumbSize);
-            $newHeight = $thumbSize;
-        }
-        $thumb = imagecreatetruecolor($newWidth, $newHeight);
-
-        imagesavealpha($thumb, true);
-
-        imagefill($thumb, 0, 0, imagecolorallocatealpha($thumb, 0, 0, 0, 127));
-
-        if ('jpg' === $extension) {
-            imagecopyresized($thumb, imagecreatefromjpeg($file), 0, 0, 0, 0, $newWidth, $newHeight, $width,
-                $height);
-            imagejpeg($thumb);
-        } elseif ('png' === $extension) {
-            imagecopyresampled($thumb, imagecreatefrompng($file), 0, 0, 0, 0, $newWidth, $newHeight, $width,
-                $height);
-            imagepng($thumb);
-        }
-    }
-    public function defaultRows() {
         return 13;
     }
-    public function defaultColumns() {
+    public function defaultColumns(): int
+    {
         return 21;
     }
 }

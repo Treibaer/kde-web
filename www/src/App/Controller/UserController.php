@@ -9,7 +9,7 @@ namespace KDE\Controller;
  */
 class UserController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $this->view->users = $this->dbManager->dbUser()->getUsersAsAssocArray();
         $this->view->tabControl = $this->worker->tabControl("user");
@@ -17,7 +17,7 @@ class UserController extends DefaultController
         $this->view->isAdmin = $this->dbManager->getUser()->isAdmin;
     }
 
-    public function twigFunctions(\Twig_Environment &$twig)
+    public function twigFunctions(\Twig_Environment &$twig): void
     {
         $twig->addFunction(new \Twig_SimpleFunction('formatDate', function ($timestamp) {
             return date("d.m.Y", $timestamp);

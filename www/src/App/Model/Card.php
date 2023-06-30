@@ -15,22 +15,13 @@ class Card extends Model
      * @TBCore\Annotation\PrimaryKey
      * @var integer
      */
-    protected $cardId = 0;
+    protected int $cardId = 0;
 
-    /**
-     * @var string
-     */
-    protected $title = "";
+    protected string $title = "";
 
-    /**
-     * @var string
-     */
-    protected $imageUrl = "";
+    protected string $imageUrl = "";
 
-    /**
-     * @var string
-     */
-    protected $type = "";
+    protected string $type = "";
 
     /**
      *
@@ -38,23 +29,20 @@ class Card extends Model
      * @var string
      */
 
-    public $originalImageUrl = "";
+    public string $originalImageUrl = "";
 
     /**
      *
      * @TBCore\Annotation\Hidden
      * @var string
      */
-    protected $thumbImageUrl = "";
+    protected string $thumbImageUrl = "";
 
     public function __construct($o = null)
     {
         parent::__construct($o);
-
         $this->originalImageUrl = $this->imageUrl;
-        //$this->imageUrl = "/kde/images/dynamic/" . $this->cardId . ".png";
         $this->thumbImageUrl = $this->imageUrl;
-        //$this->thumbImageUrl = "/kde/images/dynamic/" . $this->cardId . "_thumb.png";
     }
 
     /**

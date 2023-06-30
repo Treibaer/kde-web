@@ -14,30 +14,15 @@ use KDE\Worker\Manager as WorkerManager;
  */
 abstract class DefaultController extends \TBCore\Controller\DefaultController
 {
-    /**
-     * @var DbManager
-     */
-    protected $dbManager;
+    protected DbManager $dbManager;
 
-    /**
-     * @var CoreManager
-     */
-    protected $coreManager;
+    protected CoreManager $coreManager;
 
-    /**
-     * @var WorkerManager
-     */
-    protected $worker;
+    protected WorkerManager $worker;
 
-    /**
-     * @var AppManager
-     */
-    protected $appManager;
+    protected AppManager $appManager;
 
-    /**
-     * @var bool
-     */
-    private $error404 = false;
+    private bool $error404 = false;
 
     /**
      * DefaultController constructor.
@@ -57,16 +42,17 @@ abstract class DefaultController extends \TBCore\Controller\DefaultController
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser(): User
+    {
         return $this->dbManager->getUser();
     }
 
-    public function error404()
+    public function error404(): void
     {
         $this->error404 = true;
     }
 
-    public function render()
+    public function render(): ?array
     {
         if ($this->error404) {
             return ["pageNotFound.html.twig"];

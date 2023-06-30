@@ -10,13 +10,13 @@ use KDE\Model\Card;
  */
 class DbCard extends Database
 {
-    static $databaseName = 'KdeCard';
+    static string $databaseName = 'KdeCard';
     static $model = Card::class;
 
     /**
      * @return Card[]
      */
-    public function all()
+    public function all(): array
     {
         $output = [];
         /** @var Card[] $cards */
@@ -32,7 +32,7 @@ class DbCard extends Database
      * @param $title
      * @return null|Card
      */
-    public function getByTitle($title)
+    public function getByTitle($title): ?Card
     {
         $d = $this->get('*', [['title', '=', $title]]);
         if (count($d) > 0) {
@@ -45,7 +45,7 @@ class DbCard extends Database
      * @param $type
      * @return Card[]
      */
-    public function allByType($type)
+    public function allByType($type): array
     {
         return $this->get('*', [['type', '=', $type]]);
     }
@@ -54,7 +54,7 @@ class DbCard extends Database
      * @param $type
      * @return Card[]
      */
-    public function allByTypeJSON($type)
+    public function allByTypeJSON($type): array
     {
         $characters = $this->allByType($type);
         foreach ($characters as &$value) {
@@ -63,7 +63,7 @@ class DbCard extends Database
         return $characters;
     }
 
-    public function remove($cardId)
+    public function remove($cardId): void
     {
         $this->q('DELETE FROM ' . static::$databaseName . ' WHERE cardId=' . $cardId);
     }
@@ -71,7 +71,7 @@ class DbCard extends Database
     /**
      * @return []
      */
-    public function allJson()
+    public function allJson(): array
     {
         $characters = $this->all();
         foreach ($characters as &$value) {

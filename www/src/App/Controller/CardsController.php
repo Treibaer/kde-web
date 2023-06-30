@@ -10,11 +10,10 @@ use KDE\Model\Card;
  */
 class CardsController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
-        $type = isset($_GET['type']) ? $_GET['type'] : 'library';
+        $type = $_GET['type'] ?? 'library';
         $this->view->tabControl = $this->worker->tabControl("cards");
-        $this->view->subTabControl = $this->worker->kde()->subTabControl('cards', $type);
         $this->view->darkMode = true;
         $cards = $this->dbManager->dbCard()->allByType($type);
         $this->view->type = $type;

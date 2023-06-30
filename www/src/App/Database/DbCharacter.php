@@ -10,13 +10,13 @@ use KDE\Model\Character;
  */
 class DbCharacter extends Database
 {
-    static $databaseName = 'KdeCharacter';
+    static string $databaseName = 'KdeCharacter';
     static $model = Character::class;
 
     /**
      * @return Character[]
      */
-    public function all()
+    public function all(): array
     {
         $characters = [];
         /** @var Character[] $chars */
@@ -31,7 +31,7 @@ class DbCharacter extends Database
     /**
      * @return Character
      */
-    public function characterOfTheDay()
+    public function characterOfTheDay(): Character
     {
         /** @var Character[] $chars */
         $chars = $this->get('*');
@@ -39,9 +39,9 @@ class DbCharacter extends Database
     }
 
     /**
-     * @return []
+     * @return array
      */
-    public function allJSON()
+    public function allJSON(): array
     {
         $characters = $this->all();
         foreach ($characters as &$value) {

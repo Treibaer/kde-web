@@ -8,7 +8,7 @@ namespace KDE\Controller;
  */
 class LoginController extends DefaultController
 {
-    public function start()
+    public function start(): void
     {
         $mainSite = '/';
         if (isset($_POST["login"]) && isset($_POST["user"]) && isset($_POST["modular_password"]) && strlen($_POST["modular_password"]) > 0) {
